@@ -33,7 +33,7 @@ import EpubFile from 'epub-constructor'
 This is what file will containe
 ```json
 ►0:{path:"mimetype",content:"application/epub+zip"}
-►1:{path:"META-INF/container.xml",content:"<?xml version="1.0" encoding="UTF-8"?> <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"> <rootfiles> <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/> </rootfiles> </container>"}
+►1:{path:"META-INF/container.xml",content:"<?xml version="1.0" encoding="UTF-8"?> <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"> <rootfiles> <rootfile full-path="OEBPS/example.opf" media-type="application/oebps-package+xml"/> </rootfiles> </container>"}
 ►2:{path:"OEBPS/styles.css",content:"body { font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif; font-size: 1.125em; line-height: 1.6em; color: #000; } h1, h2, h3, h4, h5, h6 { line-height: 1em; } h1 { font-size: 3em; } h2 { font-size: 2.5em; } p { width: 100%; } "}
 ►3:{path:"OEBPS/Air born.html",content:" <?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css"/> <title>Air born</title> </head> <body> <p>this is a content</p> </body> </html> "}
 ►4:{path:"OEBPS/chapter 2.html",content:" <?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css"/> <title>chapter 2</title> </head> <body> <p>this is a content</p> </body> </html> "}

@@ -98,7 +98,7 @@ export default class EpubFile {
       `<?xml version="1.0" encoding="UTF-8"?>
       <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
       <rootfiles>
-      <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
+      <rootfile full-path="OEBPS/${this.epubSettings.title}.opf" media-type="application/oebps-package+xml"/>
       </rootfiles>
       </container>`
       )

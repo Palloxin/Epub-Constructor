@@ -1,0 +1,62 @@
+# Epub-Constructor
+This is a react library that create an epub structor. This library dose not save the structored epub file, you have to do that your self.
+This library work for react, react-native and web.
+It simple create a structored epub object that you could save it to your desired location later on.
+
+### Install
+`npm install epub-constructor`
+
+### How to use
+```js
+import EpubFile from 'epub-constructor'
+    var epub = new EpubFile({
+          title: "example",
+          language: "en",
+          description: "this is a epub test",
+          stylesheet:{
+           p: {
+            width:"100%"
+           }
+          },
+          chapters:[{
+            title: "Air born",
+            htmlBody: "<p>this is chapter 1</p>"
+          },{
+            title:"chapter 2",
+            htmlBody: "<p>this is chapter 1</p>"
+          }]
+      });
+    var file = epub.constructEpub();
+    // save the file to your device
+```
+
+This is what file will containe
+```json
+►0:{path:"mimetype",content:"application/epub+zip"}
+►1:{path:"META-INF/container.xml",content:"<?xml version="1.0" encoding="UTF-8"?> <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"> <rootfiles> <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/> </rootfiles> </container>"}
+►2:{path:"OEBPS/styles.css",content:"body { font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif; font-size: 1.125em; line-height: 1.6em; color: #000; } h1, h2, h3, h4, h5, h6 { line-height: 1em; } h1 { font-size: 3em; } h2 { font-size: 2.5em; } p { width: 100%; } "}
+►3:{path:"OEBPS/Air born.html",content:" <?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css"/> <title>Air born</title> </head> <body> <p>this is a content</p> </body> </html> "}
+►4:{path:"OEBPS/chapter 2.html",content:" <?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css"/> <title>chapter 2</title> </head> <body> <p>this is a content</p> </body> </html> "}
+►5:{path:"OEBPS/example.opf",content:"<?xml version="1.0" encoding="utf-8"?> <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0"> <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title class="title">example</dc:title><dc:language class="language">en</dc:language><dc:identifier class="identifier" id="BookId">364</dc:identifier><dc:description class="description">this is a epub test</dc:description><dc:date>Fri Oct 01 2021 16:04:48 GMT+0200 (Central European Summer Time)</dc:date><dc:rights class="rights"></dc:rights><dc:source class="source"></dc:source></metadata> <manifest><item href="styles.css" id="css1" media-type="text/css"></item><item id="Air born1" href="Air born.html" media-type="application/xhtml+xml" ></item><item id="chapter 22" href="chapter 2.html" media-type="application/xhtml+xml" ></item><item properties="nav" id="toc" href="toc.html" media-type="application/xhtml+xml" ></item> <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"></item></manifest> <spine toc="ncx"><itemref idref="Air born1" ></itemref><itemref idref="chapter 22" ></itemref></spine> </package>"}
+►6:{path:"OEBPS/toc.html",content:"<?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css" > <title>example - TOC</title> </head> <body> <nav epub:type="toc" id="toc"> <h1>Table of Contents</h1> <ol> <li><a href="Air born.html">Air born</a></li><li><a href="chapter 2.html">chapter 2</a></li></ol> </nav> </body> </html>"}
+►7:{path:"OEBPS/toc.ncx",content:"<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr"> <head> <meta name="dtb:uid" content="http://digitalpublishingtoolkit.org/ExampleEPUB.html" > <meta name="dtb:depth" content="2" > <meta name="dtb:totalPageCount" content="2" > <meta name="dtb:maxPageNumber" content="0" > </head> <docTitle> <text>example EPUB</text> </docTitle> <docAuthor> <text>undefined</text> </docAuthor> <navMap> <navPoint id="Air born1" playOrder="1"> <navLabel> <text>Air born</text> </navLabel> <content src="Air born.html" ></content></navPoint><navPoint id="chapter 22" playOrder="2"> <navLabel> <text>chapter 2</text> </navLabel> <content src="chapter 2.html" ></content></navPoint></navMap> </ncx> "}
+
+```
+You will have to create those files and make a zip file there after.
+
+
+You could also read an epub file and begin to modify or append chapters there after.
+```js
+// file have to be extracted by your self. It should look like the above json and be created by this library
+var settings = EpubFile.load(file);
+settings.chapters.push({
+title: "chapter 3",
+htmlBody: "<p>this is chapter 3</p>"
+})
+var epub = new EpubFile(settings);
+var file = epub.constructEpub();
+// save the file to your device
+```
+
+This library is new and it may containe some bugs so please report those.
+Will be glad if someone is able to create an android and IOS modules that can create the actual epub(zip) file

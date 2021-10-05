@@ -1,8 +1,14 @@
 import { parse } from 'node-html-parser';
 import * as p from 'node-html-parser';
+export interface Parameter {
+  name: string;
+  value: string;
+}
+
 export interface EpubChapter {
   title: string;
   htmlBody: string;
+  parameter?: Parameter[];
 }
 
 export interface File {
@@ -19,12 +25,13 @@ export interface EpubSettings {
   author?: string;
   chapters: EpubChapter[];
   stylesheet?: any;
+  parameter?: Parameter[];
 }
 
 const createStyle = (style: any) => {
   if (!style) style = {};
   if (typeof style == "string")
-        return style;
+    return style;
   const defaultStyle = {
     body: {
       'font-family': `"Helvetica Neue", "Helvetica", "Arial", sans-serif`,
@@ -94,8 +101,8 @@ export default class EpubFile {
     files.push(createFile('mimetype', 'application/epub+zip'));
     files.push(
       createFile(
-      'META-INF/container.xml',
-      `<?xml version="1.0" encoding="UTF-8"?>
+        'META-INF/container.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
       <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
       <rootfiles>
       <rootfile full-path="OEBPS/${this.epubSettings.title}.opf" media-type="application/oebps-package+xml"/>
@@ -106,10 +113,12 @@ export default class EpubFile {
     files.push(
       createFile('OEBPS/styles.css', createStyle(this.epubSettings.stylesheet))
     );
+
     var epub = parse(`<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0">
     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></metadata>
     <manifest></manifest>
     <spine toc="ncx"></spine>
+     <parameter>${this.epubSettings.parameter?.map(a => `<param name="${a.name}" value="${a.value}">${a.value}</param>`).join("\n") ?? ""}</parameter>
     </package>`);
     var ncxToc = parse(`<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
 	<head>
@@ -153,25 +162,30 @@ export default class EpubFile {
     epub.querySelector("metadata").appendChild(createChild(`<dc:source class="source">${this.epubSettings.source ?? ''}</dc:source>`));
     epub.querySelector("manifest").appendChild(createChild(`<item href="styles.css" id="css1" media-type="text/css"/>`));
     this.epubSettings.chapters.forEach((x, indexx) => {
-      var index = indexx+1;
+      var index = indexx + 1;
       epub.querySelector("manifest").appendChild(
         createChild(
-          `<item id="${x.title + index}" href="${
-            x.title
+          `<item id="${x.title + index}" href="${x.title
           }.html" media-type="application/xhtml+xml" />`
         )
       );
       epub.querySelector("spine").appendChild(createChild(`<itemref idref="${x.title + index}" ></itemref>`));
+      var param = "";
+      if (x.parameter && x.parameter.length > 0)
+        param = x.parameter.map(a => `<param name="${a.name}" value="${a.value}">${a.value}</param>`).join("\n");
       files.push(
         createFile(
           `OEBPS/${x.title}.html`,
-`
+          `
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
     <title>${x.title}</title>
+    <parameter>
+        ${param}
+    </parameter>
   </head>
   <body>
       ${x.htmlBody}
@@ -186,8 +200,8 @@ export default class EpubFile {
     epub.querySelector("manifest").appendChild(createChild(`<item properties="nav" id="toc" href="toc.html" media-type="application/xhtml+xml" />`));
     epub.querySelector("manifest").appendChild(createChild(` <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>`));
 
-    files.push(createFile(`OEBPS/${this.epubSettings.title}.opf`,`<?xml version="1.0" encoding="utf-8"?>\n` + epub.outerHTML));
-    files.push(createFile('OEBPS/toc.html',`<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` +htmlToc.outerHTML));
+    files.push(createFile(`OEBPS/${this.epubSettings.title}.opf`, `<?xml version="1.0" encoding="utf-8"?>\n` + epub.outerHTML));
+    files.push(createFile('OEBPS/toc.html', `<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` + htmlToc.outerHTML));
 
     files.push(createFile('OEBPS/toc.ncx', ncxToc.outerHTML));
     return files;
@@ -195,12 +209,13 @@ export default class EpubFile {
 
   // extract EpubSettings from epub file.
   static load(file: File[]) {
-    var epubSettings = {chapters: [] as EpubChapter[]} as EpubSettings;
+    var epubSettings = { chapters: [] as EpubChapter[] } as EpubSettings;
     if (!isValid(file, ['toc.ncx', 'toc.html', '.opf', 'styles.css']))
       throw 'This is not a valid Epub file created by this library(epub-constructor)';
     var page = parse(file.find((x) => x.path.indexOf('.opf') != -1)?.content ?? '');
     var style = file.find((x) => x.path.indexOf('styles.css') != -1)?.content ?? '';
-
+    
+    epubSettings.parameter = page.querySelectorAll("param").map(a => { return { name: a.getAttribute("name"), value: a.getAttribute("value") } as Parameter });
     epubSettings.title = page.querySelector('.title').innerText;
     epubSettings.author = page.querySelector('.rights').innerText;
     epubSettings.description = page.querySelector('.description').innerText;
@@ -209,12 +224,14 @@ export default class EpubFile {
     epubSettings.source = page.querySelector('.source').innerText;
     epubSettings.stylesheet = style;
     var chapters = page.querySelectorAll("itemref");
-    chapters.forEach(x=> {
+    chapters.forEach(x => {
       var chId = x.getAttribute("idref");
-      var chItem = page.querySelector("item[id='"+chId+"']").getAttribute("href");
-      var chapter =parse(file.find(x=> x.path.indexOf(chItem ?? "") != -1)?.content ?? "");
+      var chItem = page.querySelector("item[id='" + chId + "']").getAttribute("href");
+      var chapter = parse(file.find(x => x.path.indexOf(chItem ?? "") != -1)?.content ?? "");
+
       epubSettings.chapters.push(
         {
+          parameter: chapter.querySelectorAll("param").map(a => { return { name: a.getAttribute("name"), value: a.getAttribute("value") } as Parameter }),
           title: chapter.querySelector("title")?.innerText ?? "",
           htmlBody: chapter.querySelector("body").innerHTML
         }

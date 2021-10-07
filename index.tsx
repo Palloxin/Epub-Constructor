@@ -11,6 +11,10 @@ export interface EpubChapter {
   parameter?: Parameter[];
 }
 
+export interface EpubChapterLoader extends EpubChapter {
+  bodyElement?: p.HTMLElement
+}
+
 export interface File {
   path: string;
   content: string;
@@ -23,7 +27,7 @@ export interface EpubSettings {
   description?: string;
   source?: string;
   author?: string;
-  chapters: EpubChapter[];
+  chapters: EpubChapterLoader[];
   stylesheet?: any;
   parameter?: Parameter[];
 }
@@ -89,6 +93,15 @@ const isValid = (file: File[], content: string[]) => {
   }
   return true;
 };
+
+const sleep = (time: number) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(true)
+    }, time)
+  })
+}
+
 export default class EpubFile {
   epubSettings: EpubSettings;
 
@@ -96,7 +109,7 @@ export default class EpubFile {
     this.epubSettings = epubSettings;
   }
 
-  constructEpub() {
+  async constructEpub() {
     var files = [] as File[];
     files.push(createFile('mimetype', 'application/epub+zip'));
     files.push(
@@ -161,8 +174,9 @@ export default class EpubFile {
     epub.querySelector("metadata").appendChild(createChild(`<dc:rights class="rights">${this.epubSettings.author ?? ''}</dc:rights>`));
     epub.querySelector("metadata").appendChild(createChild(`<dc:source class="source">${this.epubSettings.source ?? ''}</dc:source>`));
     epub.querySelector("manifest").appendChild(createChild(`<item href="styles.css" id="css1" media-type="text/css"/>`));
-    this.epubSettings.chapters.forEach((x, indexx) => {
-      var index = indexx + 1;
+    var index = 0;
+    for (var x of this.epubSettings.chapters) {
+      index++;
       epub.querySelector("manifest").appendChild(
         createChild(
           `<item id="${x.title + index}" href="${x.title
@@ -194,9 +208,13 @@ export default class EpubFile {
       `
         )
       );
+
       htmlToc.querySelector('ol').appendChild(createChild(`<li><a href="${x.title}.html">${x.title}</a></li>`));
       ncxToc.querySelector('navmap').appendChild(createChild(`<navPoint id="${x.title + index}" playOrder="${index}"> <navLabel> <text>${x.title}</text> </navLabel> <content src="${x.title}.html" /></navPoint>`));
-    });
+
+      if (index % 50)
+        await sleep(100);
+    };
     epub.querySelector("manifest").appendChild(createChild(`<item properties="nav" id="toc" href="toc.html" media-type="application/xhtml+xml" />`));
     epub.querySelector("manifest").appendChild(createChild(` <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>`));
 
@@ -208,13 +226,13 @@ export default class EpubFile {
   }
 
   // extract EpubSettings from epub file.
-  static load(file: File[]) {
+  static async load(file: File[]) {
     var epubSettings = { chapters: [] as EpubChapter[] } as EpubSettings;
     if (!isValid(file, ['toc.ncx', 'toc.html', '.opf', 'styles.css']))
       throw 'This is not a valid Epub file created by this library(epub-constructor)';
     var page = parse(file.find((x) => x.path.indexOf('.opf') != -1)?.content ?? '');
     var style = file.find((x) => x.path.indexOf('styles.css') != -1)?.content ?? '';
-    
+
     epubSettings.parameter = page.querySelectorAll("param").map(a => { return { name: a.getAttribute("name"), value: a.getAttribute("value") } as Parameter });
     epubSettings.title = page.querySelector('.title').innerText;
     epubSettings.author = page.querySelector('.rights').innerText;
@@ -224,19 +242,25 @@ export default class EpubFile {
     epubSettings.source = page.querySelector('.source').innerText;
     epubSettings.stylesheet = style;
     var chapters = page.querySelectorAll("itemref");
-    chapters.forEach(x => {
+    var index = 0;
+    for (var x of chapters) {
       var chId = x.getAttribute("idref");
       var chItem = page.querySelector("item[id='" + chId + "']").getAttribute("href");
       var chapter = parse(file.find(x => x.path.indexOf(chItem ?? "") != -1)?.content ?? "");
 
       epubSettings.chapters.push(
         {
+          bodyElement: chapter.querySelector("body"),
           parameter: chapter.querySelectorAll("param").map(a => { return { name: a.getAttribute("name"), value: a.getAttribute("value") } as Parameter }),
           title: chapter.querySelector("title")?.innerText ?? "",
           htmlBody: chapter.querySelector("body").innerHTML
         }
       )
-    });
+      index++;
+      if (index % 20 === 0)
+        await sleep(100);
+    }
+
     return epubSettings;
   }
 }

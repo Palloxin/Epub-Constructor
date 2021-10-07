@@ -26,7 +26,7 @@ import EpubFile from 'epub-constructor'
             htmlBody: "<p>this is chapter 1</p>"
           }]
       });
-    var file = epub.constructEpub();
+    var file = await epub.constructEpub();
     // save the file to your device
 ```
 
@@ -54,7 +54,7 @@ title: "chapter 3",
 htmlBody: "<p>this is chapter 3</p>"
 })
 var epub = new EpubFile(settings);
-var file = epub.constructEpub();
+var file = await epub.constructEpub();
 // save the file to your device
 ```
 

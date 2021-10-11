@@ -1,50 +1,12 @@
 import { parse } from 'node-html-parser';
 import * as p from 'node-html-parser';
-export interface Parameter {
-  name: string;
-  value: string;
-}
+import { Parameter, EpubChapter, File, EpubSettings } from './types'
 
-export interface EpubChapter {
-  title: string;
-  htmlBody: string;
-  parameter?: Parameter[];
-}
-
-export interface EpubJson {
-  title: string,
-  fileName: string,
-  parameter?: Parameter[];
-}
-
-export interface EpubJsonSettings {
-  title: string;
-  language?: string; // Default en
-  bookId?: string;
-  description?: string;
-  source?: string;
-  author?: string;
-  chapters: EpubJson[];
-  parameter?: Parameter[];
-}
-
-export interface File {
-  path: string;
-  content: string;
-}
-
-
-
-export interface EpubSettings {
-  title: string;
-  language?: string; // Default en
-  bookId?: string;
-  description?: string;
-  source?: string;
-  author?: string;
-  chapters: EpubChapter[];
-  stylesheet?: any;
-  parameter?: Parameter[];
+export type {
+  Parameter,
+  EpubChapter,
+  File,
+  EpubSettings
 }
 
 const createStyle = (style: any) => {
@@ -62,7 +24,6 @@ const createStyle = (style: any) => {
     'h1, h2, h3, h4, h5, h6': {
       'line-height': '1em',
     },
-
     h1: {
       'font-size': '3em',
     },
@@ -76,7 +37,7 @@ const createStyle = (style: any) => {
     var current = style[x];
     var next = defaultStyle[x];
     if (next === undefined) defaultStyle[x] = current;
-    else Object.assign(defaultStyle[x], next);
+    else Object.assign(defaultStyle[x], current);
   });
   var result = '';
   Object.keys(defaultStyle).forEach((x) => {
@@ -113,6 +74,7 @@ const sleep = (time: number, args?: any) => {
     }, time)
   }) as Promise<any>;
 }
+
 const single = (array: any) => {
   if (array && array.length != undefined && array.length > 0)
     return array[0]
@@ -141,15 +103,13 @@ export const bodyExtrator = (content: string) => {
   return (single(jsonReg.exec(content)) ?? "").replace(/<body>/mgi, "").replace(/<\/body>/mgi, "");
 }
 
-
-
 export const EpubSettingsLoader = async (file: File[], localOnProgress?: (progress: number) => void) => {
   try {
     var jsonSettingsFile = file.find(x => x.path.endsWith(".json"));
     if (jsonSettingsFile)
       return parseJSon(jsonSettingsFile.content) as EpubSettings;
     var dProgress = 0.01;
-    localOnProgress?.(dProgress)
+    localOnProgress?.(dProgress);
     var epubSettings = { chapters: [] as EpubChapter[] } as EpubSettings;
     if (!isValid(file, ['toc.ncx', 'toc.html', '.opf', 'styles.css']))
       throw 'This is not a valid Epub file created by this library(epub-constructor)';
@@ -158,7 +118,6 @@ export const EpubSettingsLoader = async (file: File[], localOnProgress?: (progre
     var style = file.find((x) => x.path.indexOf('styles.css') != -1)?.content ?? '';
     var chapters = [] as string[] | p.HTMLElement[];
     epubSettings.stylesheet = style;
-
     page = parse(pageContent);
     epubSettings.parameter = page.querySelectorAll("param").map(a => { return { name: a.getAttribute("name"), value: a.getAttribute("value") } as Parameter });
     epubSettings.title = page.querySelector('.title').innerText;
@@ -224,17 +183,18 @@ export default class EpubFile {
     var manifest = [];
     var spine = [];
     this.epubSettings.bookId = this.epubSettings.bookId ?? new Date().getUTCMilliseconds().toString()
-    var fileSettings = Object.assign({} as EpubJsonSettings, this.epubSettings)
-    fileSettings.chapters = [];
     const len = this.epubSettings.chapters.length;
     var dProgress = 0;
+    this.epubSettings.fileName = this.epubSettings.fileName ?? this.epubSettings.title;
+    if (this.epubSettings.fileName.endsWith(".epub") || this.epubSettings.fileName.endsWith(".opf"))
+      this.epubSettings.fileName = this.epubSettings.fileName.replace(".opf", "").replace(".epub", "");
     files.push(
       createFile(
         'META-INF/container.xml',
         `<?xml version="1.0" encoding="UTF-8"?>
       <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
       <rootfiles>
-      <rootfile full-path="OEBPS/${this.epubSettings.title}.opf" media-type="application/oebps-package+xml"/>
+      <rootfile full-path="OEBPS/${this.epubSettings.fileName}.opf" media-type="application/oebps-package+xml"/>
       </rootfiles>
       </container>`
       )
@@ -247,7 +207,6 @@ export default class EpubFile {
     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">{#metadata}</metadata>
     <manifest>{#manifest}</manifest>
     <spine toc="ncx">{#spine}</spine>
-     <parameter>${this.epubSettings.parameter?.map(a => `<param name="${a.name}" value="${a.value}">${a.value}</param>`).join("\n") ?? ""}</parameter>
     </package>`
     var ncxToc = `<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
 	<head>
@@ -296,7 +255,7 @@ export default class EpubFile {
     const getValidName = (x: EpubChapter) => {
       var fileName = `${x.title}.html`;
       var i = 1;
-      while ((fileSettings.chapters).find(a => a.fileName == fileName)) {
+      while ((this.epubSettings.chapters).find(a => a.fileName == fileName)) {
         fileName = `${x.title + i}.html`;
         i++
       }
@@ -310,17 +269,16 @@ export default class EpubFile {
 
     for (var x of this.epubSettings.chapters) {
       dProgress = (((index - 1) / parseFloat(len.toString())) * 100)
-      const fileName = getValidName(x);
-      var ch = Object.assign({}, x) as any;
-      ch.fileName = fileName;
-      fileSettings.chapters.push(ch);
-      manifest.push(`<item id="${x.title + index}" href="${fileName}" media-type="application/xhtml+xml" />`);
+      x.fileName = x.fileName ?? getValidName(x);
+      if (!x.fileName.endsWith(".html"))
+        x.fileName += ".html";
+      manifest.push(`<item id="${x.title + index}" href="${x.fileName}" media-type="application/xhtml+xml" />`);
       spine.push(`<itemref idref="${x.title + index}" ></itemref>`);
       var param = "";
       if (x.parameter && x.parameter.length > 0)
         param = x.parameter.map(a => `<param name="${a.name}" value="${a.value}">${a.value}</param>`).join("\n");
       files.push(
-        createFile(`OEBPS/${fileName}`,
+        createFile(`OEBPS/${x.fileName}`,
           `
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
@@ -328,7 +286,6 @@ export default class EpubFile {
   <head>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
     <title>${x.title}</title>
-    <JSON>${JSON.stringify({ title: x.title, parameter: x.parameter })}</JSON>
     <parameter>
         ${param}
     </parameter>
@@ -340,8 +297,8 @@ export default class EpubFile {
       `
         )
       );
-      ol.push(`<li><a href="${fileName}">${x.title}</a></li>`)
-      navMap.push(`<navPoint id="${x.title + index}" playOrder="${index}"> <navLabel> <text>${x.title}</text> </navLabel> <content src="${fileName}" /></navPoint>`);
+      ol.push(`<li><a href="${x.fileName}">${x.title}</a></li>`)
+      navMap.push(`<navPoint id="${x.title + index}" playOrder="${index}"> <navLabel> <text>${x.title}</text> </navLabel> <content src="${x.fileName}" /></navPoint>`);
       index++;
 
       if (localOnProgress)
@@ -358,8 +315,8 @@ export default class EpubFile {
     epub = epub.replace(/{#metadata}/gi, metadata.join("\n"));
     ncxToc = ncxToc.replace(/{#navmap}/gi, navMap.join("\n"));
     htmlToc = htmlToc.replace(/{#ol}/gi, ol.join("\n"));
-    files.push(createFile(`OEBPS/${this.epubSettings.title}.json`, JSON.stringify(fileSettings)));
-    files.push(createFile(`OEBPS/${this.epubSettings.title}.opf`, `<?xml version="1.0" encoding="utf-8"?>\n` + epub));
+    files.push(createFile(`OEBPS/${this.epubSettings.fileName}.json`, JSON.stringify(this.epubSettings)));
+    files.push(createFile(`OEBPS/${this.epubSettings.fileName}.opf`, `<?xml version="1.0" encoding="utf-8"?>\n` + epub));
     files.push(createFile('OEBPS/toc.html', `<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` + htmlToc));
     files.push(createFile('OEBPS/toc.ncx', ncxToc));
     if (localOnProgress)

@@ -11,6 +11,7 @@ It simple create a structored epub object that you could save it to your desired
 import EpubFile from 'epub-constructor'
     var epub = new EpubFile({
           title: "example",
+          fileName: "examplefile" // optional, it will take title if not set
           language: "en",
           description: "this is a epub test",
           stylesheet:{
@@ -19,6 +20,7 @@ import EpubFile from 'epub-constructor'
            }
           },
           chapters:[{
+            fileName: "examplefile" // optional, it will take title if not set
             title: "Air born",
             htmlBody: "<p>this is chapter 1</p>"
           },{

@@ -1,5 +1,5 @@
 # Epub-Constructor
-This is a react library that create an epub structor. This library dose not save the structored epub file, you have to do that your self.
+This is a typescript library that create an epub structor. This library dose not save the structored epub file, you have to do that your self.
 This library work for react, react-native and web.
 It simple create a structored epub object that you could save it to your desired location later on.
 

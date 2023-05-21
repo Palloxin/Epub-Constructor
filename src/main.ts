@@ -15,14 +15,23 @@ import {
   metaDesc,
   metaId,
   metaLang,
+  metaRights,
   metaSource,
-  metaStyle,
   metaTitle,
 } from "./constructors/metadataConstructor";
 import { createChapter } from "./methods/createChapter";
-import { maniChapter, maniNav, maniToc } from "./constructors/manifestConstructor";
-
-export type { Parameter, EpubChapter, File, EpubSettings };
+import {
+  maniChapter,
+  maniNav,
+  maniStyle,
+  maniToc,
+} from "./constructors/manifestConstructor";
+import {
+  defaultContainer,
+  defaultEpub,
+  defaultHtmlToc,
+  defaultNcxToc,
+} from "./constructors/defaultsConstructor";
 
 export const EpubSettingsLoader = async (
   file: File[],
@@ -56,7 +65,8 @@ export const EpubSettingsLoader = async (
       } as Parameter;
     });
     epubSettings.title = page.querySelector(".title").innerText;
-    epubSettings.author = page.querySelector(".rights").innerText;
+    epubSettings.author = page.querySelector(".author").innerText;
+    epubSettings.rights = page.querySelector(".rights").innerText;
     epubSettings.description = page.querySelector(".description").innerText;
     epubSettings.language = page.querySelector(".language").innerText;
     epubSettings.bookId = page.querySelector(".identifier").innerHTML;
@@ -68,7 +78,7 @@ export const EpubSettingsLoader = async (
     for (let x of chapters) {
       try {
         var content = "";
-        var chItem = "" as string;
+        var chItem = "";
         var chId = x.getAttribute("idref");
         chItem =
           page
@@ -134,66 +144,29 @@ export default class EpubFile {
     files.push(
       createFile(
         "META-INF/container.xml",
-        `<?xml version="1.0" encoding="UTF-8"?>
-      <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
-      <rootfiles>
-      <rootfile full-path="OEBPS/${this.epubSettings.fileName}.opf" media-type="application/oebps-package+xml"/>
-      </rootfiles>
-      </container>`
+        defaultContainer(this.epubSettings.fileName)
       )
     );
     files.push(
       createFile("OEBPS/styles.css", createStyle(this.epubSettings.stylesheet))
     );
 
-    var epub = `<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0">
-    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">{#metadata}</metadata>
-    <manifest>{#manifest}</manifest>
-    <spine toc="ncx">{#spine}</spine>
-    </package>`;
-    var ncxToc = `<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
-	<head>
-		<meta name="dtb:uid" content="http://digitalpublishingtoolkit.org/ExampleEPUB.html" />
-		<meta name="dtb:depth" content="${this.epubSettings.chapters.length}" />
-		<meta name="dtb:totalPageCount" content="${this.epubSettings.chapters.length}" />
-		<meta name="dtb:maxPageNumber" content="0" />
-	</head>
-	<docTitle>
-		<text>${this.epubSettings.title} EPUB</text>
-	</docTitle>
+    var epub = defaultEpub();
+    var ncxToc = defaultNcxToc(
+      this.epubSettings.chapters.length,
+      this.epubSettings.title,
+      this.epubSettings.author
+    );
+    var htmlToc = defaultHtmlToc(this.epubSettings.title);
 
-	<docAuthor>
-		<text>${this.epubSettings.author}</text>
-	</docAuthor>
-
-	<navMap>
-  {#navMap}
-	</navMap>
-</ncx>
-`;
-
-    var htmlToc = `<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-  <head>
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-    <title>${this.epubSettings.title} - TOC</title>
-  </head>
-  <body>
-    <nav epub:type="toc" id="toc">
-      <h1>Table of Contents</h1>
-      <ol>
-        {#ol}
-      </ol>
-    </nav>
-  </body>
-</html>`;
     metadata.push(metaTitle(this.epubSettings.title));
     metadata.push(metaLang(this.epubSettings.language));
     metadata.push(metaId(this.epubSettings.bookId));
     metadata.push(metaDesc(this.epubSettings.description));
     metadata.push(metaDate());
     metadata.push(metaAuthor(this.epubSettings.author));
+    metadata.push(metaRights(this.epubSettings.rights));
     metadata.push(metaSource(this.epubSettings.source));
-    metadata.push(metaStyle());
 
     var index = 1;
     var navMap = [""];
@@ -227,6 +200,7 @@ export default class EpubFile {
     }
 
     manifest.push(maniNav());
+    manifest.push(maniStyle());
     manifest.push(maniToc());
 
     epub = epub.replace("#manifest", manifest.join("\n"));
@@ -254,7 +228,7 @@ export default class EpubFile {
       )
     );
     files.push(createFile("OEBPS/toc.ncx", ncxToc));
-    
+
     if (localOnProgress)
       await localOnProgress?.((len / parseFloat(len.toString())) * 100);
     return files;

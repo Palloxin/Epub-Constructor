@@ -13,6 +13,7 @@ export interface Parameter {
   export interface File {
     path: string;
     content: string;
+    format?: string;
   }
 
   
@@ -27,5 +28,7 @@ export interface Parameter {
     chapters: EpubChapter[];
     stylesheet?: any;
     parameter?: Parameter[];
+    rights?: string;
+    cover?: any; // TODO Change to correct type
   }
 

@@ -7,3 +7,10 @@ export function maniNav() {
 export function maniToc() {
   return `<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>`;
 }
+
+export function maniStyle() {
+  return `<item href="styles.css" id="css1" media-type="text/css"/>`;
+}
+export function maniCover() {
+  return `<item id="cover" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image" />`;
+}

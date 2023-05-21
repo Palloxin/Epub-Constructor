@@ -13,14 +13,14 @@ export function metaDesc(description: string | undefined) {
   }</dc:description>`;
 }
 export function metaAuthor(author: string | undefined) {
-  return `<dc:rights class="rights">${author ?? ""}</dc:rights>`;
+  return `<dc:creator class="author">${author ?? ""}</dc:creator>`;
+}
+export function metaRights(rights: string | undefined) {
+  return `<dc:rights class="rights">${rights ?? ""}</dc:rights>`;
 }
 export function metaSource(source: string | undefined) {
   return `<dc:source class="source">${source ?? ""}</dc:source>`;
 }
 export function metaDate() {
   return `<dc:date>${new Date()}</dc:date>`;
-}
-export function metaStyle() {
-  return `<item href="styles.css" id="css1" media-type="text/css"/>`;
 }

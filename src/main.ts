@@ -35,7 +35,9 @@ import {
 } from "./constructors/defaultsConstructor";
 
 const getImageType = (path: string) => {
-  return path.trim().match(/(?<=\.)([a-z]){1,4}(?=\?|$)/);
+  console.log(path);
+
+  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/);
 };
 
 export const EpubSettingsLoader = async (
@@ -158,7 +160,8 @@ export default class EpubFile {
         .replace(".epub", "");
     }
     if (this.epubSettings.cover) {
-      const fileType = getImageType(this.epubSettings.cover)
+      const fileType = getImageType(this.epubSettings.cover);
+      console.log(fileType);
       files.push(
         createFile(
           "OEBPS/images/cover." + fileType,
@@ -236,7 +239,6 @@ export default class EpubFile {
     ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
 
-    
     files.push(
       createFile(
         `OEBPS/${this.epubSettings.fileName}.opf`,

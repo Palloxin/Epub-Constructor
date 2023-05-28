@@ -231,12 +231,7 @@ export default class EpubFile {
     ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
 
-    files.push(
-      createFile(
-        `OEBPS/${this.epubSettings.fileName}.json`,
-        JSON.stringify(this.epubSettings)
-      )
-    );
+    
     files.push(
       createFile(
         `OEBPS/${this.epubSettings.fileName}.opf`,

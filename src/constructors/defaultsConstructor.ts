@@ -8,9 +8,9 @@ export function defaultContainer(fileName: string) {
 }
 export function defaultEpub() {
   return `<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0">
-    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">{#metadata}</metadata>
-    <manifest>{#manifest}</manifest>
-    <spine toc="ncx">{#spine}</spine>
+    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">#metadata</metadata>
+    <manifest>#manifest</manifest>
+    <spine toc="ncx">#spine</spine>
     </package>`;
 }
 export function defaultNcxToc(
@@ -49,7 +49,7 @@ export function defaultHtmlToc(title: string) {
         <nav epub:type="toc" id="toc">
           <h1>Table of Contents</h1>
           <ol>
-            {#ol}
+            #ol
           </ol>
         </nav>
       </body>

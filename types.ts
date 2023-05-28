@@ -13,7 +13,7 @@ export interface Parameter {
   export interface File {
     path: string;
     content: string;
-    format?: string;
+    isImage?: string;
   }
 
   

@@ -1,10 +1,10 @@
 import { EpubChapter, File } from "../../types";
 
-export function createFile(path: string, content: string, format?: string) {
+export function createFile(path: string, content: string, isImage?: boolean) {
   return {
     path,
     content,
-    format
+    isImage
   } as File;
 }
 

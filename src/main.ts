@@ -34,6 +34,10 @@ import {
   defaultNcxToc,
 } from "./constructors/defaultsConstructor";
 
+const getImageType = (path: string) => {
+  return path.trim().match(/(?<=\.)([a-z]){1,4}(?=\?|$)/);
+};
+
 export const EpubSettingsLoader = async (
   file: File[],
   localOnProgress?: (progress: number) => void
@@ -154,11 +158,12 @@ export default class EpubFile {
         .replace(".epub", "");
     }
     if (this.epubSettings.cover) {
+      const fileType = getImageType(this.epubSettings.cover)
       files.push(
         createFile(
-          "OEBPS/images/cover.jpg",
+          "OEBPS/images/cover." + fileType,
           this.epubSettings.cover,
-          "image/jpeg"
+          true
         )
       );
       manifest.push(maniCover());

@@ -54,11 +54,11 @@ export function bodyExtrator(content: string) {
     .replace(/<\/body>/gim, "");
 }
 
-export function getValidName(x: EpubChapter) {
-  var fileName = `${x.title}.html`;
+export function getValidName(chapter: EpubChapter, chapters: EpubChapter[]) {
+  var fileName = `${chapter.title}.html`;
   var i = 1;
-  while (this.epubSettings.chapters.find((a) => a.fileName == fileName)) {
-    fileName = `${x.title + i}.html`;
+  while (chapters.find((a) => a.fileName == fileName)) {
+    fileName = `${chapter.title + i}.html`;
     i++;
   }
 

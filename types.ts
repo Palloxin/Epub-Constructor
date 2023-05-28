@@ -25,7 +25,7 @@ export interface Parameter {
     description?: string;
     source?: string;
     author?: string;
-    chapters: EpubChapter[];
+    chapters?: EpubChapter[];
     stylesheet?: any;
     parameter?: Parameter[];
     rights?: string;

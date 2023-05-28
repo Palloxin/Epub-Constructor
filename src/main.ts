@@ -73,6 +73,10 @@ export const EpubSettingsLoader = async (
     epubSettings.source = page.querySelector(".source").innerText;
     chapters = page.querySelectorAll("itemref");
 
+    if (!epubSettings.chapters) {
+      epubSettings.chapters = [] as EpubChapter[];
+    }
+
     const len = chapters.length + 1;
     var index = 0;
     for (let x of chapters) {
@@ -120,13 +124,20 @@ export default class EpubFile {
     this.epubSettings = epubSettings;
   }
 
-  async constructEpub(localOnProgress?: (progress: number) => Promise<void>) {
+  public async constructEpub(
+    localOnProgress?: (progress: number) => Promise<void>
+  ) {
     var files = [] as File[];
     files.push(createFile("mimetype", "application/epub+zip"));
     var metadata = [""];
     var manifest = [""];
     var spine = [""];
     var dProgress = 0;
+
+    if (!this.epubSettings.chapters) {
+      throw new Error("Epub file needs at least one chapter");
+    }
+
     const len = this.epubSettings.chapters.length;
 
     this.epubSettings.bookId =
@@ -150,7 +161,6 @@ export default class EpubFile {
     files.push(
       createFile("OEBPS/styles.css", createStyle(this.epubSettings.stylesheet))
     );
-
     var epub = defaultEpub();
     var ncxToc = defaultNcxToc(
       this.epubSettings.chapters.length,
@@ -171,11 +181,11 @@ export default class EpubFile {
     var index = 1;
     var navMap = [""];
     var ol = [""];
-
     for (var chapter of this.epubSettings.chapters) {
       dProgress = ((index - 1) / parseFloat(len.toString())) * 100;
 
-      chapter.fileName = chapter.fileName ?? getValidName(chapter);
+      chapter.fileName =
+        chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters);
       if (!chapter.fileName.endsWith(".html")) chapter.fileName += ".html";
 
       manifest.push(

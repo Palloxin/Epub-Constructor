@@ -29,6 +29,6 @@ export interface Parameter {
     stylesheet?: any;
     parameter?: Parameter[];
     rights?: string;
-    cover?: any; // TODO Change to correct type
+    cover?: string;
   }
 

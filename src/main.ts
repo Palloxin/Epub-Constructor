@@ -22,6 +22,7 @@ import {
 import { createChapter } from "./methods/createChapter";
 import {
   maniChapter,
+  maniCover,
   maniNav,
   maniStyle,
   maniToc,
@@ -152,6 +153,17 @@ export default class EpubFile {
         .replace(".opf", "")
         .replace(".epub", "");
     }
+    if (this.epubSettings.cover) {
+      files.push(
+        createFile(
+          "OEBPS/images/cover.jpg",
+          this.epubSettings.cover,
+          "image/jpeg"
+        )
+      );
+      manifest.push(maniCover());
+      spine.push('<itemref idref="cover" linear="no"/>');
+    }
     files.push(
       createFile(
         "META-INF/container.xml",
@@ -216,7 +228,7 @@ export default class EpubFile {
     epub = epub.replace("#manifest", manifest.join("\n"));
     epub = epub.replace("#spine", spine.join("\n"));
     epub = epub.replace("#metadata", metadata.join("\n"));
-    ncxToc = ncxToc.replace("#navmap", navMap.join("\n"));
+    ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
 
     files.push(
@@ -249,3 +261,4 @@ export default class EpubFile {
     return await EpubSettingsLoader(file);
   }
 }
+

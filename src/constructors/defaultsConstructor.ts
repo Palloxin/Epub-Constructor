@@ -34,7 +34,7 @@ export function defaultNcxToc(
 	</docAuthor>
 
 	<navMap>
-  {#navMap}
+  #navMap
 	</navMap>
 </ncx>
 `;

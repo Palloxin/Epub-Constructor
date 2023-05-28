@@ -24,3 +24,6 @@ export function metaSource(source: string | undefined) {
 export function metaDate() {
   return `<dc:date>${new Date()}</dc:date>`;
 }
+export function metaCover() {
+  return '<meta name="cover" content="cover"/>'
+}

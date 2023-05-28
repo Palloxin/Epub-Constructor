@@ -35,8 +35,6 @@ import {
 } from "./constructors/defaultsConstructor";
 
 const getImageType = (path: string) => {
-  console.log(path);
-
   return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/);
 };
 
@@ -112,14 +110,13 @@ export const EpubSettingsLoader = async (
         index++;
         await sleep(0);
       } catch (error) {
-        console.error(error);
+        throw error;
       }
     }
     dProgress = (len / parseFloat(len.toString())) * 100;
     localOnProgress?.(dProgress);
     return epubSettings;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -161,7 +158,6 @@ export default class EpubFile {
     }
     if (this.epubSettings.cover) {
       const fileType = getImageType(this.epubSettings.cover);
-      console.log(fileType);
       files.push(
         createFile(
           "OEBPS/images/cover." + fileType,

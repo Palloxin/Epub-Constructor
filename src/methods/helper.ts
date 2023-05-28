@@ -4,7 +4,7 @@ export function createFile(path: string, content: string, isImage?: boolean) {
   return {
     path,
     content,
-    isImage
+    isImage,
   } as File;
 }
 
@@ -35,8 +35,7 @@ export function parseJSon(json: string) {
   try {
     return JSON.parse(json);
   } catch (e) {
-    console.log(e);
-    return undefined;
+    throw e;
   }
 }
 
@@ -64,3 +63,4 @@ export function getValidName(chapter: EpubChapter, chapters: EpubChapter[]) {
 
   return fileName;
 }
+

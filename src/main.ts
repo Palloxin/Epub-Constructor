@@ -11,6 +11,7 @@ import {
 import { createStyle } from "./methods/createStyle";
 import {
   metaAuthor,
+  metaCover,
   metaDate,
   metaDesc,
   metaId,
@@ -193,6 +194,7 @@ export default class EpubFile {
     metadata.push(metaAuthor(this.epubSettings.author));
     metadata.push(metaRights(this.epubSettings.rights));
     metadata.push(metaSource(this.epubSettings.source));
+    metadata.push(metaCover());
 
     var index = 1;
     var navMap = [""];
@@ -201,7 +203,8 @@ export default class EpubFile {
       dProgress = ((index - 1) / parseFloat(len.toString())) * 100;
 
       chapter.fileName =
-        chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters);
+        "content/" +
+        (chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters));
       if (!chapter.fileName.endsWith(".xhtml")) chapter.fileName += ".xhtml";
 
       manifest.push(

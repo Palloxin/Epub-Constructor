@@ -11,7 +11,7 @@ export function createChapter(chapter: EpubChapter) {
       .join("\n");
 
   return createFile(
-    `EPUB/content/${chapter.fileName}`,
+    `EPUB/${chapter.fileName}`,
     `
     <?xml version="1.0" encoding="utf-8"?>
     <!DOCTYPE html>

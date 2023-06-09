@@ -54,10 +54,10 @@ export function bodyExtrator(content: string) {
 }
 
 export function getValidName(chapter: EpubChapter, chapters: EpubChapter[]) {
-  var fileName = `${chapter.title}.html`;
+  var fileName = `${chapter.title}.xhtml`;
   var i = 1;
   while (chapters.find((a) => a.fileName == fileName)) {
-    fileName = `${chapter.title + i}.html`;
+    fileName = `${chapter.title + i}.xhtml`;
     i++;
   }
 

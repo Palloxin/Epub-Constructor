@@ -2,7 +2,7 @@ export function defaultContainer(fileName: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>
     <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
     <rootfiles>
-    <rootfile full-path="OEBPS/${fileName}.opf" media-type="application/oebps-package+xml"/>
+    <rootfile full-path="EPUB/${fileName}.opf" media-type="application/epub-package+xml"/>
     </rootfiles>
     </container>`;
 }
@@ -18,9 +18,10 @@ export function defaultNcxToc(
   title: string,
   author?: string
 ) {
-  return `<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
+  return `<?xml version="1.0" encoding="UTF-8"?>
+  <ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
 	<head>
-		<meta name="dtb:uid" content="http://digitalpublishingtoolkit.org/ExampleEPUB.html" />
+		<meta name="dtb:uid" content="http://digitalpublishingtoolkit.org/ExampleEPUB.xhtml" />
 		<meta name="dtb:depth" content="${chapterLength}" />
 		<meta name="dtb:totalPageCount" content="${chapterLength}" />
 		<meta name="dtb:maxPageNumber" content="0" />

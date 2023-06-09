@@ -50,7 +50,7 @@ export const EpubSettingsLoader = async (
     var dProgress = 0.01;
     localOnProgress?.(dProgress);
     var epubSettings = { chapters: [] as EpubChapter[] } as EpubSettings;
-    if (!isValid(file, ["toc.ncx", "toc.html", ".opf", "styles.css"])) {
+    if (!isValid(file, ["toc.ncx", "toc.xhtml", ".opf", "styles.css"])) {
       throw "This is not a valid Epub file created by this library(epub-constructor)";
     }
 
@@ -160,7 +160,7 @@ export default class EpubFile {
       const fileType = getImageType(this.epubSettings.cover);
       files.push(
         createFile(
-          "OEBPS/images/cover." + fileType,
+          "EPUB/images/cover." + fileType,
           this.epubSettings.cover,
           true
         )
@@ -175,7 +175,7 @@ export default class EpubFile {
       )
     );
     files.push(
-      createFile("OEBPS/styles.css", createStyle(this.epubSettings.stylesheet))
+      createFile("EPUB/styles.css", createStyle(this.epubSettings.stylesheet))
     );
     var epub = defaultEpub();
     var ncxToc = defaultNcxToc(
@@ -202,7 +202,7 @@ export default class EpubFile {
 
       chapter.fileName =
         chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters);
-      if (!chapter.fileName.endsWith(".html")) chapter.fileName += ".html";
+      if (!chapter.fileName.endsWith(".xhtml")) chapter.fileName += ".xhtml";
 
       manifest.push(
         maniChapter(chapter.title + index.toString(), chapter.fileName)
@@ -237,17 +237,17 @@ export default class EpubFile {
 
     files.push(
       createFile(
-        `OEBPS/${this.epubSettings.fileName}.opf`,
+        `EPUB/${this.epubSettings.fileName}.opf`,
         `<?xml version="1.0" encoding="utf-8"?>\n` + epub
       )
     );
     files.push(
       createFile(
-        "OEBPS/toc.html",
+        "EPUB/toc.xhtml",
         `<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` + htmlToc
       )
     );
-    files.push(createFile("OEBPS/toc.ncx", ncxToc));
+    files.push(createFile("EPUB/toc.ncx", ncxToc));
 
     if (localOnProgress)
       await localOnProgress?.((len / parseFloat(len.toString())) * 100);

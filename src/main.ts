@@ -9,17 +9,7 @@ import {
   sleep,
 } from "./methods/helper";
 import { createStyle } from "./methods/createStyle";
-import {
-  metaAuthor,
-  metaCover,
-  metaDate,
-  metaDesc,
-  metaId,
-  metaLang,
-  metaRights,
-  metaSource,
-  metaTitle,
-} from "./constructors/metadataConstructor";
+import { createMetadata } from "./constructors/metadataConstructor";
 import { createChapter } from "./methods/createChapter";
 import {
   maniChapter,
@@ -134,7 +124,7 @@ export default class EpubFile {
   ) {
     var files = [] as File[];
     files.push(createFile("mimetype", "application/epub+zip"));
-    var metadata = [""];
+    var metadata = "";
     var manifest = [""];
     var spine = [""];
     var dProgress = 0;
@@ -147,8 +137,9 @@ export default class EpubFile {
 
     this.epubSettings.bookId =
       this.epubSettings.bookId ?? new Date().getUTCMilliseconds().toString();
-    this.epubSettings.fileName =
-      this.epubSettings.fileName ?? this.epubSettings.title;
+    this.epubSettings.fileName = (
+      this.epubSettings.fileName ?? this.epubSettings.title
+    ).replace(" ", "_");
     if (
       this.epubSettings.fileName.endsWith(".epub") ||
       this.epubSettings.fileName.endsWith(".opf")
@@ -157,6 +148,7 @@ export default class EpubFile {
         .replace(".opf", "")
         .replace(".epub", "");
     }
+
     if (this.epubSettings.cover) {
       const fileType = getImageType(this.epubSettings.cover);
       files.push(
@@ -167,7 +159,7 @@ export default class EpubFile {
         )
       );
       manifest.push(maniCover());
-      spine.push('<itemref idref="cover" linear="no"/>');
+      spine.push('<itemref idref="cover"/>');
     }
     files.push(
       createFile(
@@ -182,19 +174,12 @@ export default class EpubFile {
     var ncxToc = defaultNcxToc(
       this.epubSettings.chapters.length,
       this.epubSettings.title,
+      this.epubSettings.bookId,
       this.epubSettings.author
     );
     var htmlToc = defaultHtmlToc(this.epubSettings.title);
 
-    metadata.push(metaTitle(this.epubSettings.title));
-    metadata.push(metaLang(this.epubSettings.language));
-    metadata.push(metaId(this.epubSettings.bookId));
-    metadata.push(metaDesc(this.epubSettings.description));
-    metadata.push(metaDate());
-    metadata.push(metaAuthor(this.epubSettings.author));
-    metadata.push(metaRights(this.epubSettings.rights));
-    metadata.push(metaSource(this.epubSettings.source));
-    metadata.push(metaCover());
+    metadata = createMetadata(this.epubSettings);
 
     var index = 1;
     var navMap = [""];
@@ -202,21 +187,32 @@ export default class EpubFile {
     for (var chapter of this.epubSettings.chapters) {
       dProgress = ((index - 1) / parseFloat(len.toString())) * 100;
 
+      let idRef = chapter.title.replace(" ", "_") + "_" + index.toString();
+
       chapter.fileName =
         "content/" +
-        (chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters));
+        (
+          chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters)
+        ).replace(" ", "_");
       if (!chapter.fileName.endsWith(".xhtml")) chapter.fileName += ".xhtml";
 
       manifest.push(
-        maniChapter(chapter.title + index.toString(), chapter.fileName)
+        maniChapter(
+          idRef,
+          chapter.fileName
+        )
       );
-      spine.push(`<itemref idref="${chapter.title + index}" ></itemref>`);
+      spine.push(
+        `<itemref idref="${
+          idRef
+        }" ></itemref>`
+      );
       files.push(createChapter(chapter));
 
       ol.push(`<li><a href="${chapter.fileName}">${chapter.title}</a></li>`);
       navMap.push(
         `<navPoint id="${
-          chapter.title + index
+          idRef
         }" playOrder="${index}"> <navLabel> <text>${
           chapter.title
         }</text> </navLabel> <content src="${chapter.fileName}" /></navPoint>`
@@ -234,16 +230,11 @@ export default class EpubFile {
 
     epub = epub.replace("#manifest", manifest.join("\n"));
     epub = epub.replace("#spine", spine.join("\n"));
-    epub = epub.replace("#metadata", metadata.join("\n"));
+    epub = epub.replace("#metadata", metadata);
     ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
 
-    files.push(
-      createFile(
-        `EPUB/${this.epubSettings.fileName}.opf`,
-        `<?xml version="1.0" encoding="utf-8"?>\n` + epub
-      )
-    );
+    files.push(createFile(`EPUB/${this.epubSettings.fileName}.opf`, epub));
     files.push(
       createFile(
         "EPUB/toc.xhtml",

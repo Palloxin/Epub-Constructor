@@ -1,27 +1,35 @@
 export function defaultContainer(fileName: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>
     <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
-    <rootfiles>
-    <rootfile full-path="EPUB/${fileName}.opf" media-type="application/oebps-package+xml"/>
-    </rootfiles>
+      <rootfiles>
+        <rootfile full-path="EPUB/${fileName}.opf" media-type="application/oebps-package+xml"/>
+      </rootfiles>
     </container>`;
 }
 export function defaultEpub() {
-  return `<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0">
-    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">#metadata</metadata>
-    <manifest>#manifest</manifest>
-    <spine toc="ncx">#spine</spine>
+  return `<?xml version='1.0' encoding='utf-8'?>
+    <package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" unique-identifier="BookId" version="3.0">
+      <metadata >
+        #metadata
+      </metadata>
+      <manifest>
+        #manifest
+      </manifest>
+      <spine toc="ncx">
+        #spine
+      </spine>
     </package>`;
 }
 export function defaultNcxToc(
   chapterLength: number,
   title: string,
+  bookId: string,
   author?: string
 ) {
   return `<?xml version="1.0" encoding="UTF-8"?>
   <ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
 	<head>
-		<meta name="dtb:uid" content="http://digitalpublishingtoolkit.org/ExampleEPUB.xhtml" />
+		<meta name="dtb:uid" content="${bookId}" />
 		<meta name="dtb:depth" content="${chapterLength}" />
 		<meta name="dtb:totalPageCount" content="${chapterLength}" />
 		<meta name="dtb:maxPageNumber" content="0" />
@@ -41,10 +49,11 @@ export function defaultNcxToc(
 `;
 }
 export function defaultHtmlToc(title: string) {
-  return `<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  return `<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
       <head>
-        <link rel="stylesheet" type="text/css" href="styles.css" />
         <title>${title} - TOC</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <link rel="stylesheet" type="text/css" href="styles.css" />
       </head>
       <body>
         <nav epub:type="toc" id="toc">
@@ -56,3 +65,4 @@ export function defaultHtmlToc(title: string) {
       </body>
     </html>`;
 }
+

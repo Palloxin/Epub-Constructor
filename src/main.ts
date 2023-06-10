@@ -159,7 +159,6 @@ export default class EpubFile {
         )
       );
       manifest.push(maniCover());
-      spine.push('<itemref idref="cover"/>');
     }
     files.push(
       createFile(

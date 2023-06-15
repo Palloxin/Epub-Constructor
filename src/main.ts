@@ -143,7 +143,10 @@ export default class EpubFile {
     this.epubSettings.bookId =
       this.epubSettings.bookId ?? new Date().getUTCMilliseconds().toString();
     this.epubSettings.fileName = clearFileNameType(
-      (this.epubSettings.fileName ?? this.epubSettings.title).replace(/\s/g, "_")
+      (this.epubSettings.fileName ?? this.epubSettings.title).replace(
+        /\s/g,
+        "_"
+      )
     );
 
     if (this.epubSettings.cover) {
@@ -190,17 +193,18 @@ export default class EpubFile {
 
       var i = 0;
 
-      chapter.htmlBody = chapter.htmlBody.replace(
-        /(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi,
-        (uri: string) => {
+      chapter.htmlBody = chapter.htmlBody
+        .replace(/(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi, (uri: string) => {
           i++;
           const fileType = getImageType(uri);
           const path = `images/${idRef + i}.` + fileType;
           files.push(createFile(`EPUB/${path}`, uri, true));
-          manifest.push(maniImage(path))
+          manifest.push(maniImage(path));
           return `../${path}`;
-        }
-      ).replace(/<br>/g,'').replace(/\&nbsp/g,'');
+        })
+        .replace(/<br>/g, "")
+        .replace(/\&nbsp/g, "")
+        .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>");
 
       manifest.push(maniChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));

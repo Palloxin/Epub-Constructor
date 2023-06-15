@@ -1,12 +1,20 @@
 import { parse } from "node-html-parser";
 import * as p from "node-html-parser";
-import { Parameter, EpubChapter, File, EpubSettings } from "../types";
+import {
+  Parameter,
+  EpubChapter,
+  File,
+  EpubSettings,
+  InternalEpubChapter,
+} from "../types";
 import {
   createFile,
-  getValidName,
   isValid,
   parseJSon,
   sleep,
+  getImageType,
+  clearFileNameType,
+  setChapterFileNames,
 } from "./methods/helper";
 import { createStyle } from "./methods/createStyle";
 import { createMetadata } from "./constructors/metadataConstructor";
@@ -14,6 +22,7 @@ import { createChapter } from "./methods/createChapter";
 import {
   maniChapter,
   maniCover,
+  maniImage,
   maniNav,
   maniStyle,
   maniToc,
@@ -24,10 +33,6 @@ import {
   defaultHtmlToc,
   defaultNcxToc,
 } from "./constructors/defaultsConstructor";
-
-const getImageType = (path: string) => {
-  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/);
-};
 
 export const EpubSettingsLoader = async (
   file: File[],
@@ -137,17 +142,9 @@ export default class EpubFile {
 
     this.epubSettings.bookId =
       this.epubSettings.bookId ?? new Date().getUTCMilliseconds().toString();
-    this.epubSettings.fileName = (
-      this.epubSettings.fileName ?? this.epubSettings.title
-    ).replace(" ", "_");
-    if (
-      this.epubSettings.fileName.endsWith(".epub") ||
-      this.epubSettings.fileName.endsWith(".opf")
-    ) {
-      this.epubSettings.fileName = this.epubSettings.fileName
-        .replace(".opf", "")
-        .replace(".epub", "");
-    }
+    this.epubSettings.fileName = clearFileNameType(
+      (this.epubSettings.fileName ?? this.epubSettings.title).replace(" ", "_")
+    );
 
     if (this.epubSettings.cover) {
       const fileType = getImageType(this.epubSettings.cover);
@@ -176,45 +173,46 @@ export default class EpubFile {
       this.epubSettings.bookId,
       this.epubSettings.author
     );
+
     var htmlToc = defaultHtmlToc(this.epubSettings.title);
-
     metadata = createMetadata(this.epubSettings);
-
-    var index = 1;
     var navMap = [""];
     var ol = [""];
-    for (var chapter of this.epubSettings.chapters) {
+
+    this.epubSettings.chapters = setChapterFileNames(
+      this.epubSettings.chapters
+    );
+    var index = 1;
+    for (var chapter of this.epubSettings.chapters as InternalEpubChapter[]) {
       dProgress = ((index - 1) / parseFloat(len.toString())) * 100;
 
       let idRef = chapter.title.replace(" ", "_") + "_" + index.toString();
 
-      chapter.fileName =
-        "content/" +
-        (
-          chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters)
-        ).replace(" ", "_");
-      if (!chapter.fileName.endsWith(".xhtml")) chapter.fileName += ".xhtml";
+      var i = 0;
 
-      manifest.push(
-        maniChapter(
-          idRef,
-          chapter.fileName
-        )
+      chapter.htmlBody = chapter.htmlBody.replace(
+        /(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi,
+        (uri: string) => {
+          i++;
+          const fileType = getImageType(uri);
+          const path = `images/${idRef + i}.` + fileType;
+          files.push(createFile(`EPUB/${path}`, uri, true));
+          manifest.push(maniImage(path))
+          return `../${path}`;
+        }
       );
-      spine.push(
-        `<itemref idref="${
-          idRef
-        }" ></itemref>`
-      );
+
+      manifest.push(maniChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));
 
+      spine.push(`<itemref idref="${idRef}" ></itemref>`);
       ol.push(`<li><a href="${chapter.fileName}">${chapter.title}</a></li>`);
       navMap.push(
-        `<navPoint id="${
-          idRef
-        }" playOrder="${index}"> <navLabel> <text>${
-          chapter.title
-        }</text> </navLabel> <content src="${chapter.fileName}" /></navPoint>`
+        `<navPoint id="${idRef}" playOrder="${index}"> 
+          <navLabel> 
+            <text>${chapter.title}</text>
+          </navLabel> <content src="${chapter.fileName}" />
+        </navPoint>`
       );
 
       index++;

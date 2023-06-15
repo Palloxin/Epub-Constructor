@@ -9,6 +9,12 @@ export interface Parameter {
     htmlBody: string;
     parameter?: Parameter[];
   }
+  export interface InternalEpubChapter {
+    fileName: string;
+    title: string;
+    htmlBody: string;
+    parameter?: Parameter[];
+  }
 
   export interface File {
     path: string;

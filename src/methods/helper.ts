@@ -1,4 +1,4 @@
-import { EpubChapter, File } from "../../types";
+import { EpubChapter, File, InternalEpubChapter } from "../../types";
 
 export function createFile(path: string, content: string, isImage?: boolean) {
   return {
@@ -53,14 +53,39 @@ export function bodyExtrator(content: string) {
     .replace(/<\/body>/gim, "");
 }
 
-export function getValidName(chapter: EpubChapter, chapters: EpubChapter[]) {
-  var fileName = `${chapter.title}.xhtml`;
-  var i = 1;
+export function getImageType(path: string) {
+  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/) ?? 'jpg';
+}
+
+export function clearFileNameType(name: string) {
+  if (name.endsWith(".epub") || name.endsWith(".opf")) {
+    return name.replace(".opf", "").replace(".epub", "");
+  }
+  return name;
+}
+
+function validateName(fileName: string, chapters: EpubChapter[]) {
+  var i = 0;
   while (chapters.find((a) => a.fileName == fileName)) {
-    fileName = `${chapter.title + i}.xhtml`;
     i++;
+    fileName += i;
   }
 
   return fileName;
+}
+
+export function setChapterFileNames(chapters: EpubChapter[]) {
+  chapters.map((chapter: EpubChapter, i: number) => {
+    if (chapter.fileName) {
+      chapter.fileName = chapter.fileName.replace(".xhtml", "");
+    } else {
+      chapter.fileName = chapter.title;
+    }
+    chapter.fileName =
+      "content/" +
+      validateName(chapter.fileName, chapters).replace(" ", "_") +
+      ".xhtml";
+  });
+  return chapters as InternalEpubChapter[];
 }
 

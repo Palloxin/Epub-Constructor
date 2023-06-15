@@ -14,4 +14,10 @@ export function maniStyle() {
 export function maniCover() {
   return `<item id="cover" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image" />`;
 }
+export function maniImage(uri: string) {
+  return `<item id="${uri.replace(
+    /.*\//,
+    ""
+  )}" href="${uri}" media-type="image/jpeg" />`;
+}
 

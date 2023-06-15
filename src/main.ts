@@ -143,7 +143,7 @@ export default class EpubFile {
     this.epubSettings.bookId =
       this.epubSettings.bookId ?? new Date().getUTCMilliseconds().toString();
     this.epubSettings.fileName = clearFileNameType(
-      (this.epubSettings.fileName ?? this.epubSettings.title).replace(" ", "_")
+      (this.epubSettings.fileName ?? this.epubSettings.title).replace(/\s/g, "_")
     );
 
     if (this.epubSettings.cover) {
@@ -186,7 +186,7 @@ export default class EpubFile {
     for (var chapter of this.epubSettings.chapters as InternalEpubChapter[]) {
       dProgress = ((index - 1) / parseFloat(len.toString())) * 100;
 
-      let idRef = chapter.title.replace(" ", "_") + "_" + index.toString();
+      let idRef = chapter.title.replace(/\s/g, "_") + "_" + index.toString();
 
       var i = 0;
 
@@ -200,7 +200,7 @@ export default class EpubFile {
           manifest.push(maniImage(path))
           return `../${path}`;
         }
-      );
+      ).replace(/<br>/g,'').replace(/\&nbsp/g,'');
 
       manifest.push(maniChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));

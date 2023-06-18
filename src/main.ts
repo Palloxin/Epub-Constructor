@@ -202,9 +202,9 @@ export default class EpubFile {
           manifest.push(maniImage(path));
           return `../${path}`;
         })
-        .replace(/<br>/g, "")
         .replace(/\&nbsp/g, "")
-        .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>");
+        .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>")
+        .replace(/<\/?(?:html|head|body|input|br)[^>]*>/g,'');
 
       manifest.push(maniChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));

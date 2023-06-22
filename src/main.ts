@@ -1,5 +1,4 @@
-import { parse } from "node-html-parser";
-import * as p from "node-html-parser";
+import { parse, HTMLElement } from "node-html-parser";
 import {
   Parameter,
   EpubChapter,
@@ -54,10 +53,10 @@ export const EpubSettingsLoader = async (
       file.find((x) => x.path.indexOf(".opf") != -1)?.content ?? "";
     var style =
       file.find((x) => x.path.indexOf("styles.css") != -1)?.content ?? "";
-    var chapters = [] as string[] | p.HTMLElement[];
+    var chapters = [] as string[] | HTMLElement[];
 
     epubSettings.stylesheet = style;
-    var page = undefined as undefined | p.HTMLElement;
+    var page = undefined as undefined | HTMLElement;
     page = parse(pageContent);
     epubSettings.parameter = page.querySelectorAll("param").map((a) => {
       return {
@@ -204,7 +203,7 @@ export default class EpubFile {
         })
         .replace(/\&nbsp/g, "")
         .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>")
-        .replace(/<\/?(?:html|head|body|input|br)[^>]*>/g,'');
+        .replace(/<\/?(?:html|head|body|input|br)[^>]*>/g, "");
 
       manifest.push(maniChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));

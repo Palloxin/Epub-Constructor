@@ -1,5 +1,5 @@
 export function maniChapter(id: string, href: string) {
-  return `<item id="${id}" href="${href}" media-type="application/xhtml+xml" />`;
+  return `<item id="${id}" href="${href}" media-type="application/xhtml+xml" properties="scripted"/>`;
 }
 export function maniNav() {
   return `<item properties="nav" id="toc" href="toc.xhtml" media-type="application/xhtml+xml" />`;

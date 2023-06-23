@@ -36,5 +36,6 @@ export interface Parameter {
     parameter?: Parameter[];
     rights?: string;
     cover?: string;
+    js?: string;
   }
 

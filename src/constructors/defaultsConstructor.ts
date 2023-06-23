@@ -13,6 +13,7 @@ export function defaultEpub() {
         #metadata
       </metadata>
       <manifest>
+        <item id="script" href="script.js" media-type="text/javascript"/>
         #manifest
       </manifest>
       <spine toc="ncx">

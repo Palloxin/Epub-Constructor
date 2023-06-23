@@ -10,8 +10,9 @@ export function createChapter(chapter: EpubChapter) {
         <head>
             <link rel="stylesheet" type="text/css" href="../styles.css"/>
             <title>${chapter.title}</title>
+            <script src="../script.js"></script>
         </head>
-        <body>
+        <body onload="fnEpub()">
             ${chapter.htmlBody}
         </body>
     </html>

@@ -168,6 +168,12 @@ export default class EpubFile {
     files.push(
       createFile("EPUB/styles.css", createStyle(this.epubSettings.stylesheet))
     );
+    files.push(
+      createFile(
+        "EPUB/script.js",
+        `function fnEpub(){${this.epubSettings.js ?? ""}}`
+      )
+    );
     var epub = defaultEpub();
     var ncxToc = defaultNcxToc(
       this.epubSettings.chapters.length,

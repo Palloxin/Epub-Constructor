@@ -1,3 +1,12 @@
+/**
+ * Generates an EPUB container XML string.
+ *
+ * The EPUB container file is used to specify the location of the EPUB package file,
+ * which contains the content of the EPUB book.
+ *
+ * @param fileName - The name of the EPUB package file without the file extension.
+ * @returns The EPUB container XML string.
+ */
 export function defaultContainer(fileName: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>
     <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
@@ -6,6 +15,11 @@ export function defaultContainer(fileName: string) {
       </rootfiles>
     </container>`;
 }
+/**
+ * Generates a default EPUB XML structure with placeholders for metadata, manifest, and spine.
+ *
+ * @returns {string} The default EPUB XML structure.
+ */
 export function defaultEpub() {
   return `<?xml version='1.0' encoding='utf-8'?>
     <package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" unique-identifier="BookId" version="3.0">
@@ -21,6 +35,15 @@ export function defaultEpub() {
       </spine>
     </package>`;
 }
+/**
+ * Generates the default XML structure for the table of contents (TOC) of an EPUB book.
+ *
+ * @param chapterLength The length of the book's chapters.
+ * @param title The title of the book.
+ * @param bookId The unique identifier for the book.
+ * @param author The author of the book (optional).
+ * @returns The XML string representing the TOC.
+ */
 export function defaultNcxToc(
   chapterLength: number,
   title: string,
@@ -49,6 +72,12 @@ export function defaultNcxToc(
 </ncx>
 `;
 }
+/**
+ * Generates an HTML table of contents (TOC) page with a customizable title.
+ *
+ * @param title - The title of the TOC page.
+ * @returns The HTML string representing the TOC page.
+ */
 export function defaultHtmlToc(title: string) {
   return `<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
       <head>

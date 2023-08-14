@@ -1,6 +1,12 @@
 import { EpubChapter } from "../../types";
 import { createFile } from "./helper";
 
+/**
+ * Creates an EPUB chapter file with the provided chapter information.
+ *
+ * @param chapter - The chapter object containing the chapter details.
+ * @returns The created File object representing the chapter file.
+ */
 export function createChapter(chapter: EpubChapter) {
   return createFile(
     `EPUB/${chapter.fileName}`,
@@ -19,3 +25,4 @@ export function createChapter(chapter: EpubChapter) {
       `
   );
 }
+

@@ -1,3 +1,11 @@
+/**
+ * Generates a CSS string based on the provided style object.
+ * If the style object is a string, it is returned as is.
+ * The style object is merged with a default style object.
+ *
+ * @param style - The style object to generate CSS from.
+ * @returns The CSS string representing the merged style object.
+ */
 export function createStyle(style: any) {
   if (!style) style = {};
   if (typeof style == "string") return style;
@@ -8,7 +16,6 @@ export function createStyle(style: any) {
       "line-height": "1.6em",
       color: "#000",
     },
-
     "h1, h2, h3, h4, h5, h6": {
       "line-height": "1em",
     },
@@ -38,3 +45,4 @@ export function createStyle(style: any) {
   });
   return result;
 }
+

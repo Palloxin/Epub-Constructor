@@ -17,7 +17,7 @@ export function createFile(
     path,
     content,
     isImage,
-  } as File;
+  };
 }
 
 /**
@@ -195,10 +195,7 @@ export function setChapterFileNames(
     return newChapter;
   });
   return sanitizedChapters.map((chapter: InternalEpubChapter, i: number) => {
-    let fileName =
-      "content/" +
-      validateName(chapter.fileName, sanitizedChapters).replace(/ /g, "_") +
-      ".xhtml";
+    let fileName = "content/" + chapter.fileName.replace(/ /g, "_") + ".xhtml";
     let j = 1;
     while (usedNames.has(fileName)) {
       fileName = fileName.replace(/(\d+)?\.xhtml$/, `${j}.xhtml`);

@@ -4,7 +4,7 @@
   "description": "This is a react library that create an epub structor. This library dose not save the structored epub file, you have to do that yourself. This library work for react, react-native and web. It simple create a structored epub object that you could save it to your desired location later on.",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -27,9 +27,13 @@
   "author": "Alen Toma & Patrick Loser",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "@typescript-eslint/parser": "^5.59.9",
     "eslint": "^8.42.0",
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.1.3"
   }
 }
+

@@ -1,4 +1,4 @@
-import parse from "node-html-parser";
+import parse, { HTMLElement } from "node-html-parser";
 import { EpubSettings, EpubChapter, Parameter, File } from "../../types";
 import { parseJSon, isValid, sleep } from "../methods/helper";
 

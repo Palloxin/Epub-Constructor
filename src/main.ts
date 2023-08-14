@@ -52,6 +52,9 @@ export default class EpubFile {
     ) {
       throw new Error("Epub file needs at least one chapter");
     }
+    if (!this.epubSettings.title || this.epubSettings.title.trim() === "") {
+      throw new Error("Epub file needs a title");
+    }
 
     const len = this.epubSettings.chapters.length;
 
@@ -101,12 +104,13 @@ export default class EpubFile {
     this.epubSettings.chapters = setChapterFileNames(
       this.epubSettings.chapters
     );
+    console.log(this.epubSettings.chapters);
 
     for (let index = 0; index < len; index++) {
       const chapter = this.epubSettings.chapters[index] as InternalEpubChapter;
       dProgress = (index / len) * 100;
 
-      const idRef = `${chapter.title.replace(/\s/g, "_")}_${index + 1}`;
+      const idRef = `${chapter.title.replace(/\s/g, "_")}_image_`;
 
       let imageIndex = 0;
       chapter.htmlBody = chapter.htmlBody

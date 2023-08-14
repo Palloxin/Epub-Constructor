@@ -6,7 +6,7 @@ It simple create a structored epub object that you could save it to your desired
 
 ### Install
 
-`npm install epub-constructor`
+`npm install @cd-z/epub-constructor`
 
 ### How to use
 

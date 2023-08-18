@@ -221,8 +221,8 @@ describe("EpubFile contents", () => {
     expect(files[1].path).toBe("EPUB/styles.css");
   });
 
-  // Tests that the EPUB file is constructed correctly when own css parameter is provided
-  it("should construct EPUB file with own css", async () => {
+  // Tests that the EPUB file is constructed correctly when own css parameter is provided as string
+  it("should construct EPUB file with own css as string", async () => {
     const epubSettings: EpubSettings = {
       title: "Test Book",
       chapters: [
@@ -232,6 +232,27 @@ describe("EpubFile contents", () => {
         },
       ],
       stylesheet: "body {\n" + " background-color: black;\n" + "}\n",
+    };
+    const epubFile = new EpubFile(epubSettings);
+    const files = await epubFile.constructEpub();
+
+    expect(files.length).toBe(7);
+    expect(files[1].content).toBe(
+      "body {\n" + " background-color: black;\n" + "}\n"
+    );
+    expect(files[1].path).toBe("EPUB/styles.css");
+  });
+  // Tests that the EPUB file is constructed correctly when own css parameter is provided as object
+  it("should construct EPUB file with own css as object", async () => {
+    const epubSettings: EpubSettings = {
+      title: "Test Book",
+      chapters: [
+        {
+          title: "Chapter 1",
+          htmlBody: "<h1>Chapter 1</h1>",
+        },
+      ],
+      stylesheet: { body: { "background-color": "black" } },
     };
     const epubFile = new EpubFile(epubSettings);
     const files = await epubFile.constructEpub();

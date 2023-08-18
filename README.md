@@ -37,7 +37,7 @@ import EpubFile from 'epub-constructor'
 
 This is what file will containe
 
-```json
+```js
 [
   {path:"mimetype",content:"application/epub+zip"},
   {path:"META-INF/container.xml",content:"<?xml version="1.0" encoding="UTF-8"?> <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"> <rootfiles> <rootfile full-path="EPUB/example.opf" media-type="application/oebps-package+xml"/> </rootfiles> </container>"},

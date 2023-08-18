@@ -164,6 +164,7 @@ export default class EpubFile {
       )
     );
     files.push(createFile("EPUB/toc.ncx", ncxToc));
+    files.push(createFile("mimetype", "application/epub+zip"));
 
     if (localOnProgress) {
       await localOnProgress(len);

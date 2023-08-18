@@ -137,7 +137,7 @@ describe("EpubFile Path names", () => {
     };
     const epubFile = new EpubFile(epubSettings);
     const files = await epubFile.constructEpub();
-    expect(files.length).toBe(7);
+    expect(files.length).toBe(8);
     expect(files[0].path).toBe("META-INF/container.xml");
     expect(files[1].path).toBe("EPUB/styles.css");
     expect(files[2].path).toBe("EPUB/script.js");
@@ -145,6 +145,7 @@ describe("EpubFile Path names", () => {
     expect(files[4].path).toBe("EPUB/Test_Book.opf");
     expect(files[5].path).toBe("EPUB/toc.xhtml");
     expect(files[6].path).toBe("EPUB/toc.ncx");
+    expect(files[7].path).toBe("mimetype");
   });
 });
 
@@ -181,7 +182,7 @@ describe("EpubFile contents", () => {
     };
     const epubFile = new EpubFile(epubSettings);
     const files = await epubFile.constructEpub();
-    expect(files.length).toBe(7);
+    expect(files.length).toBe(8);
     expect(files[2].content).toBe("function fnEpub(){}");
     expect(files[2].path).toBe("EPUB/script.js");
   });
@@ -200,7 +201,7 @@ describe("EpubFile contents", () => {
     const epubFile = new EpubFile(epubSettings);
     const files = await epubFile.constructEpub();
 
-    expect(files.length).toBe(7);
+    expect(files.length).toBe(8);
     expect(files[1].content).toBe(
       "body {\n" +
         ' font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;\n' +
@@ -236,7 +237,7 @@ describe("EpubFile contents", () => {
     const epubFile = new EpubFile(epubSettings);
     const files = await epubFile.constructEpub();
 
-    expect(files.length).toBe(7);
+    expect(files.length).toBe(8);
     expect(files[1].content).toBe(
       "body {\n" + " background-color: black;\n" + "}\n"
     );
@@ -257,7 +258,7 @@ describe("EpubFile contents", () => {
     const epubFile = new EpubFile(epubSettings);
     const files = await epubFile.constructEpub();
 
-    expect(files.length).toBe(7);
+    expect(files.length).toBe(8);
     expect(files[1].content).toBe(
       "body {\n" + " background-color: black;\n" + "}\n"
     );

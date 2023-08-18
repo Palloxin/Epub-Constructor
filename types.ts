@@ -31,7 +31,7 @@ export interface EpubSettings {
   source?: string;
   author?: string;
   chapters?: EpubChapter[];
-  stylesheet?: any;
+  stylesheet?: string;
   parameter?: Parameter[];
   rights?: string;
   cover?: string;

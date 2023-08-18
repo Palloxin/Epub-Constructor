@@ -104,7 +104,6 @@ export default class EpubFile {
     this.epubSettings.chapters = setChapterFileNames(
       this.epubSettings.chapters
     );
-    console.log(this.epubSettings.chapters);
 
     for (let index = 0; index < len; index++) {
       const chapter = this.epubSettings.chapters[index] as InternalEpubChapter;

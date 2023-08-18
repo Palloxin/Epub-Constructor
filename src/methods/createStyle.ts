@@ -6,43 +6,24 @@
  * @param style - The style object to generate CSS from.
  * @returns The CSS string representing the merged style object.
  */
-export function createStyle(style: any) {
-  if (!style) style = {};
+export function createStyle(style?: string) {
   if (typeof style == "string") return style;
-  const defaultStyle = {
-    body: {
-      "font-family": `"Helvetica Neue", "Helvetica", "Arial", sans-serif`,
-      "font-size": "1.125em",
-      "line-height": "1.6em",
-      color: "#000",
-    },
-    "h1, h2, h3, h4, h5, h6": {
-      "line-height": "1em",
-    },
-    h1: {
-      "font-size": "3em",
-    },
-
-    h2: {
-      "font-size": "2.5em",
-    },
-  } as any;
-
-  Object.keys(style).forEach((x) => {
-    var current = style[x];
-    var next = defaultStyle[x];
-    if (next === undefined) defaultStyle[x] = current;
-    else Object.assign(defaultStyle[x], current);
-  });
-  var result = "";
-  Object.keys(defaultStyle).forEach((x) => {
-    var item = x + " {";
-    Object.keys(defaultStyle[x]).forEach((a) => {
-      item += `\n ${a}: ${defaultStyle[x][a]};`;
-    });
-    item += "\n}\n";
-    result += item;
-  });
-  return result;
+  const defaultStyle =
+    "body {\n" +
+    ' font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;\n' +
+    " font-size: 1.125em;\n" +
+    " line-height: 1.6em;\n" +
+    " color: #000;\n" +
+    "}\n" +
+    "h1, h2, h3, h4, h5, h6 {\n" +
+    " line-height: 1em;\n" +
+    "}\n" +
+    "h1 {\n" +
+    " font-size: 3em;\n" +
+    "}\n" +
+    "h2 {\n" +
+    " font-size: 2.5em;\n" +
+    "}\n";
+  return defaultStyle;
 }
 

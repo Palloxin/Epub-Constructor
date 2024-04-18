@@ -1,14 +1,14 @@
-import { File, EpubSettings, InternalEpubChapter } from "../types";
+import { File, EpubSettings, InternalEpubChapter } from "@types";
 import {
   createFile,
   sleep,
   getImageType,
   removeFileExtension,
   setChapterFileNames,
-} from "./methods/helper";
-import { createStyle } from "./methods/createStyle";
-import { createMetadata } from "./constructors/metadataConstructor";
-import { createChapter } from "./methods/createChapter";
+} from "@methods/helper";
+import { createStyle } from "@methods/createStyle";
+import { createMetadata } from "@constructors/metadataConstructor";
+import { createChapter } from "@methods/createChapter";
 import {
   manifestChapter,
   manifestCover,
@@ -16,14 +16,14 @@ import {
   manifestNav,
   manifestStyle,
   manifestToc,
-} from "./constructors/manifestConstructor";
+} from "@constructors/manifestConstructor";
 import {
   defaultContainer,
   defaultEpub,
   defaultHtmlToc,
   defaultNcxToc,
-} from "./constructors/defaultsConstructor";
-import { EpubSettingsLoader } from "./loader/EpubSettingsLoader";
+} from "@constructors/defaultsConstructor";
+import { EpubSettingsLoader } from "@loader/EpubSettingsLoader";
 
 export default class EpubFile {
   epubSettings: EpubSettings;

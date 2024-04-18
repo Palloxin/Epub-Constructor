@@ -77,12 +77,8 @@ export default class EpubFile {
       createFile(
         "META-INF/container.xml",
         defaultContainer(this.epubSettings.fileName)
-      )
-    );
-    files.push(
-      createFile("EPUB/styles.css", createStyle(this.epubSettings.stylesheet))
-    );
-    files.push(
+      ),
+      createFile("EPUB/styles.css", createStyle(this.epubSettings.stylesheet)),
       createFile(
         "EPUB/script.js",
         `function fnEpub(){${this.epubSettings.js ?? ""}}`
@@ -127,7 +123,6 @@ export default class EpubFile {
 
       manifest.push(manifestChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));
-
       spine.push(`<itemref idref="${idRef}" ></itemref>`);
       ol.push(`<li><a href="${chapter.fileName}">${chapter.title}</a></li>`);
       navMap.push(
@@ -146,25 +141,24 @@ export default class EpubFile {
       }
     }
 
-    manifest.push(manifestNav());
-    manifest.push(manifestStyle());
-    manifest.push(manifestToc());
+    manifest.push(manifestNav(), manifestStyle(), manifestToc());
 
-    epub = epub.replace("#manifest", manifest.join("\n"));
-    epub = epub.replace("#spine", spine.join("\n"));
-    epub = epub.replace("#metadata", metadata);
+    epub = epub
+      .replace("#manifest", manifest.join("\n"))
+      .replace("#spine", spine.join("\n"))
+      .replace("#metadata", metadata);
     ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
 
-    files.push(createFile(`EPUB/${this.epubSettings.fileName}.opf`, epub));
     files.push(
+      createFile(`EPUB/${this.epubSettings.fileName}.opf`, epub),
       createFile(
         "EPUB/toc.xhtml",
         `<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` + htmlToc
-      )
+      ),
+      createFile("EPUB/toc.ncx", ncxToc),
+      createFile("mimetype", "application/epub+zip")
     );
-    files.push(createFile("EPUB/toc.ncx", ncxToc));
-    files.push(createFile("mimetype", "application/epub+zip"));
 
     if (localOnProgress) {
       await localOnProgress(len);
@@ -182,4 +176,3 @@ export default class EpubFile {
     return await EpubSettingsLoader(file);
   }
 }
-

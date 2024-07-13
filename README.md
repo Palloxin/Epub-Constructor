@@ -45,7 +45,7 @@ This is what file will containe
   {path:"EPUB/Air born.html",content:'<?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css"/> <title>Air born</title> </head> <body> <p>this is a content</p> </body> </html>'},
   {path:"EPUB/chapter 2.html",content:' <?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css"/> <title>chapter 2</title> </head> <body> <p>this is a content</p> </body> </html>'},
   {path:"EPUB/example.opf",content:'<?xml version="1.0" encoding="utf-8"?> <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0"> <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title class="title">example</dc:title><dc:language class="language">en</dc:language><dc:identifier class="identifier" id="BookId">364</dc:identifier><dc:description class="description">this is a epub test</dc:description><dc:date>Fri Oct 01 2021 16:04:48 GMT+0200 (Central European Summer Time)</dc:date><dc:rights class="rights"></dc:rights><dc:source class="source"></dc:source></metadata> <manifest><item href="styles.css" id="css1" media-type="text/css"></item><item id="Air born1" href="Air born.html" media-type="application/xhtml+xml" ></item><item id="chapter 22" href="chapter 2.html" media-type="application/xhtml+xml" ></item><item properties="nav" id="toc" href="toc.html" media-type="application/xhtml+xml" ></item> <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"></item></manifest> <spine toc="ncx"><itemref idref="Air born1" ></itemref><itemref idref="chapter 22" ></itemref></spine> </package>'},
-  {path:"EPUB/toc.html",content:'<?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css" > <title>example - TOC</title> </head> <body> <nav epub:type="toc" id="toc"> <h1>Table of Contents</h1> <ol> <li><a href="Air born.html">Air born</a></li><li><a href="chapter 2.html">chapter 2</a></li></ol> </nav> </body> </html>'},
+  {path:"EPUB/toc.html",content:'<?xml version="1.0" encoding="utf-8"?> <!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"> <head> <link rel="stylesheet" type="text/css" href="styles.css" > <title>toc</title> </head> <body> <nav epub:type="toc" id="toc"> <h1>Table of Contents</h1> <ol> <li><a href="Air born.html">Air born</a></li><li><a href="chapter 2.html">chapter 2</a></li></ol> </nav> </body> </html>'},
   {path:"EPUB/toc.ncx",content:'<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr"> <head> <meta name="dtb:uid" content="http://digitalpublishingtoolkit.org/ExampleEPUB.html" > <meta name="dtb:depth" content="2" > <meta name="dtb:totalPageCount" content="2" > <meta name="dtb:maxPageNumber" content="0" > </head> <docTitle> <text>example EPUB</text> </docTitle> <docAuthor> <text>undefined</text> </docAuthor> <navMap> <navPoint id="Air born1" playOrder="1"> <navLabel> <text>Air born</text> </navLabel> <content src="Air born.html" ></content></navPoint><navPoint id="chapter 22" playOrder="2"> <navLabel> <text>chapter 2</text> </navLabel> <content src="chapter 2.html" ></content></navPoint></navMap> </ncx>'}
 ]
 ```
@@ -60,8 +60,8 @@ You could also read an epub file and begin to modify or append chapters there af
 // file have to be extracted by your self. It should look like the above json and be created by this library
 var settings = EpubFile.load(file);
 settings.chapters.push({
-  title: "chapter 3",
-  htmlBody: "<p>this is chapter 3</p>",
+  title: 'chapter 3',
+  htmlBody: '<p>this is chapter 3</p>',
 });
 var epub = new EpubFile(settings);
 var file = await epub.constructEpub();
@@ -70,4 +70,3 @@ var file = await epub.constructEpub();
 
 This library is new and it may containe some bugs so please report those.
 Will be glad if someone is able to create an android and IOS modules that can create the actual epub(zip) file
-

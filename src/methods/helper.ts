@@ -1,4 +1,4 @@
-import { EpubChapter, File, InternalEpubChapter } from "../../types";
+import {EpubChapter, File, InternalEpubChapter} from '../../types';
 
 /**
  * Creates a file object with the specified path, content, and optional isImage flag.
@@ -11,7 +11,7 @@ import { EpubChapter, File, InternalEpubChapter } from "../../types";
 export function createFile(
   path: string,
   content: string,
-  isImage?: boolean
+  isImage?: boolean,
 ): File {
   return {
     path,
@@ -29,7 +29,7 @@ export function createFile(
  */
 export function isValid(file: File[], content: string[]): boolean {
   for (var i = 0; i < content.length; i++) {
-    var item = file.find((x) => x.path.indexOf(content[i]) != -1);
+    var item = file.find(x => x.path.indexOf(content[i]) != -1);
     if (!item) return false;
   }
   return true;
@@ -85,10 +85,10 @@ export function parseJSon(json: string) {
  * @returns The extracted JSON string, or an empty string if no JSON is found.
  */
 export function jsonExtractor(content: string) {
-  const jsonReg = new RegExp(/<JSON>(.|\n)*?<\/JSON>/, "mgi");
-  return (single(jsonReg.exec(content)) ?? "")
-    .replace(/<JSON>/gim, "")
-    .replace(/<\/JSON>/gim, "");
+  const jsonReg = new RegExp(/<JSON>(.|\n)*?<\/JSON>/, 'mgi');
+  return (single(jsonReg.exec(content)) ?? '')
+    .replace(/<JSON>/gim, '')
+    .replace(/<\/JSON>/gim, '');
 }
 
 /**
@@ -98,10 +98,10 @@ export function jsonExtractor(content: string) {
  * @returns The extracted body content without the <body> tags.
  */
 export function bodyExtrator(content: string) {
-  const jsonReg = new RegExp(/<body>(.|\n)*?<\/body>/, "mgi");
-  return (single(jsonReg.exec(content)) ?? "")
-    .replace(/<body>/gim, "")
-    .replace(/<\/body>/gim, "");
+  const jsonReg = new RegExp(/<body>(.|\n)*?<\/body>/, 'mgi');
+  return (single(jsonReg.exec(content)) ?? '')
+    .replace(/<body>/gim, '')
+    .replace(/<\/body>/gim, '');
 }
 
 /**
@@ -117,7 +117,7 @@ export function bodyExtrator(content: string) {
  * console.log(imageType); // Output: "jpg"
  */
 export function getImageType(path: string) {
-  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/) ?? "jpg";
+  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/) ?? 'jpg';
 }
 
 /**
@@ -132,7 +132,7 @@ export function getImageType(path: string) {
  * console.log(result); // Output: "example"
  */
 export function removeFileExtension(name: string) {
-  return name.replace(/(.*)(\.opf|\.epub)/, "$1");
+  return name.replace(/(.*)(\.opf|\.epub)/, '$1');
 }
 
 /**
@@ -145,7 +145,7 @@ export function removeFileExtension(name: string) {
  */
 function validateName(fileName: string, chapters: EpubChapter[]) {
   var i = 0;
-  while (chapters.find((a) => a.fileName == fileName)) {
+  while (chapters.find(a => a.fileName == fileName)) {
     i++;
     fileName += i;
   }
@@ -164,8 +164,8 @@ function validateName(fileName: string, chapters: EpubChapter[]) {
  * const sanitizedFileName = sanitizeFileName(fileName);
  * console.log(sanitizedFileName); // Output: "my_filetxt"
  */
-function sanitizeFileName(fileName: string) {
-  return fileName.replace(/[^\w\s]/gi, ""); // remove all non-word and non-space characters
+export function sanitizeFileName(fileName: string) {
+  return fileName.replace(/[^\w\s]/gi, '').toLowerCase(); // remove all non-word and non-space characters
 }
 
 /**
@@ -179,13 +179,13 @@ function sanitizeFileName(fileName: string) {
  * @returns The modified array of EpubChapter objects with the file names updated.
  */
 export function setChapterFileNames(
-  chapters: EpubChapter[]
+  chapters: EpubChapter[],
 ): InternalEpubChapter[] {
   const usedNames = new Set<string>();
   const sanitizedChapters = chapters.map((chapter: EpubChapter) => {
     const newChapter: InternalEpubChapter = {
       fileName: chapter.fileName
-        ? chapter.fileName.replace(".xhtml", "")
+        ? chapter.fileName.replace('.xhtml', '')
         : chapter.title,
       title: chapter.title,
       htmlBody: chapter.htmlBody,
@@ -195,7 +195,8 @@ export function setChapterFileNames(
     return newChapter;
   });
   return sanitizedChapters.map((chapter: InternalEpubChapter, i: number) => {
-    let fileName = "content/" + chapter.fileName.replace(/ /g, "_") + ".xhtml";
+    let fileName =
+      'content/' + chapter.fileName.replaceAll(' ', '_') + '.xhtml';
     let j = 1;
     while (usedNames.has(fileName)) {
       fileName = fileName.replace(/(\d+)?\.xhtml$/, `${j}.xhtml`);
@@ -203,7 +204,8 @@ export function setChapterFileNames(
     }
     usedNames.add(fileName);
     chapter.fileName = fileName;
+    console.log(fileName);
+
     return chapter;
   });
 }
-

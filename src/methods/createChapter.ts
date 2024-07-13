@@ -1,5 +1,5 @@
-import { EpubChapter } from "../../types";
-import { createFile } from "./helper";
+import {EpubChapter} from '../../types';
+import {createFile} from './helper';
 
 /**
  * Creates an EPUB chapter file with the provided chapter information.
@@ -8,6 +8,9 @@ import { createFile } from "./helper";
  * @returns The created File object representing the chapter file.
  */
 export function createChapter(chapter: EpubChapter) {
+  console.log(chapter.fileName.toLocaleLowerCase().replaceAll(' ', ''));
+  console.log('create', chapter.fileName);
+
   return createFile(
     `EPUB/${chapter.fileName}`,
     `
@@ -22,7 +25,6 @@ export function createChapter(chapter: EpubChapter) {
             ${chapter.htmlBody}
         </body>
     </html>
-      `
+      `,
   );
 }
-

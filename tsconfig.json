@@ -1,13 +1,13 @@
 {
-    "compilerOptions": {
-        "types": ["bun-types"],
-      "baseUrl": "./src/",
-      "paths": {
-        "test": ["../tests/*.test.ts"],
-        "@constructors/*": ["constructors/*"],
-        "@loader/*": ["loader/*"],
-        "@methods/*": ["methods/*"],
-        "@types": ["../types.ts"] 
-      }
-    }
+  "compilerOptions": {
+    "types": ["bun-types"]
+    // "baseUrl": "./src/",
+    // "paths": {
+    //   "test": ["../tests/*.test.ts"],
+    //   "@constructors/*": ["constructors/*"],
+    //   "@loader/*": ["loader/*"],
+    //   "@methods/*": ["methods/*"],
+    //   "@types": ["../types.ts"]
+    // }
   }
+}

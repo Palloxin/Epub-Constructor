@@ -79,7 +79,10 @@ export function defaultNcxToc(
  * @returns The HTML string representing the TOC page.
  */
 export function defaultHtmlToc(title: string) {
-  return `<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
+  return `
+  <?xml version="1.0" encoding="utf-8"?>
+  <!DOCTYPE html>
+  <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
       <head>
         <title>${title} - TOC</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -95,4 +98,3 @@ export function defaultHtmlToc(title: string) {
       </body>
     </html>`;
 }
-

@@ -119,7 +119,7 @@ export default class EpubFile {
         })
         .replace(/\&nbsp/g, "")
         .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>")
-        .replace(/<\/?(?:html|head|body|input|br)[^>]*>/g, "");
+        .replace(/<\/?(?:html|head|body|input)[^>]*>/g, "");
 
       manifest.push(manifestChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));
@@ -152,10 +152,7 @@ export default class EpubFile {
 
     files.push(
       createFile(`EPUB/${this.epubSettings.fileName}.opf`, epub),
-      createFile(
-        "EPUB/toc.xhtml",
-        `<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` + htmlToc
-      ),
+      createFile("EPUB/toc.xhtml", htmlToc),
       createFile("EPUB/toc.ncx", ncxToc),
       createFile("mimetype", "application/epub+zip")
     );

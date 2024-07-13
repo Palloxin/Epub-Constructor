@@ -1,32 +1,28 @@
 import { EpubChapter } from "../../types";
 import { createFile } from "./helper";
 
+/**
+ * Creates an EPUB chapter file with the provided chapter information.
+ *
+ * @param chapter - The chapter object containing the chapter details.
+ * @returns The created File object representing the chapter file.
+ */
 export function createChapter(chapter: EpubChapter) {
-  var param = "";
-  if (chapter.parameter && chapter.parameter.length > 0)
-    param = chapter.parameter
-      .map(
-        (a) => `<param name="${a.name}" value="${a.value}">${a.value}</param>`
-      )
-      .join("\n");
-
   return createFile(
-    `OEBPS/${chapter.fileName}`,
+    `EPUB/${chapter.fileName}`,
     `
-    <?xml version="1.0" encoding="utf-8"?>
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
         <head>
-            <link rel="stylesheet" type="text/css" href="styles.css"/>
+            <link rel="stylesheet" type="text/css" href="../styles.css"/>
             <title>${chapter.title}</title>
-            <parameter>
-                ${param}
-            </parameter>
+            <script src="../script.js"></script>
         </head>
-        <body>
+        <body onload="fnEpub()">
             ${chapter.htmlBody}
         </body>
     </html>
       `
   );
 }
+

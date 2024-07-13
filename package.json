@@ -1,11 +1,8 @@
 {
   "name": "@cd-z/epub-constructor",
-  "version": "1.2.0",
+  "version": "2.2.5",
   "description": "This is a react library that create an epub structor. This library dose not save the structored epub file, you have to do that yourself. This library work for react, react-native and web. It simple create a structored epub object that you could save it to your desired location later on.",
   "main": "index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/CD-Z/Epub-Constructor.git"
@@ -17,7 +14,6 @@
   "keywords": [
     "epub",
     "react",
-    "react-native",
     "epub-creator",
     "epub-constructor"
   ],
@@ -25,5 +21,13 @@
     "node-html-parser": "^4.1.4"
   },
   "author": "Alen Toma & Patrick Loser",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
+    "bun-types": "^1.1.4",
+    "eslint": "^8.42.0",
+    "typescript": "^5.1.3"
+  }
 }

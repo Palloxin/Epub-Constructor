@@ -1,29 +1,25 @@
-export function metaTitle(title: string) {
-  return `<dc:title class="title">${title ?? ""}</dc:title>`;
+import { EpubSettings } from "../../types";
+
+/**
+ * Generates metadata for an EPUB file based on the provided settings.
+ * If any setting is missing, default values will be used.
+ *
+ * @param epubSettings - The settings for the EPUB file.
+ * @returns The generated metadata string.
+ */
+export function createMetadata(epubSettings: EpubSettings) {
+  return `
+    <dc:title>${epubSettings.title ?? "Unnamed"}</dc:title>
+    <dc:creator>${epubSettings.author ?? "Unnamed"}</dc:creator>
+    <dc:description>${epubSettings.description ?? "None"}</dc:description>
+    <dc:language>${epubSettings.language ?? "en"}</dc:language>
+    <dc:identifier id="BookId">${epubSettings.bookId}</dc:identifier>
+    <dc:rights id="rights">${epubSettings.rights ?? "None"}</dc:rights>
+    <dc:source id="source">${epubSettings.source ?? "None"}</dc:source>
+    <dc:date>${new Date().toISOString()}</dc:date>
+    <meta property="dcterms:modified">${
+      new Date().toISOString().split(".")[0] + "Z"
+    }</meta>
+    <meta name="cover" content="cover"/>`;
 }
-export function metaLang(lang: string | undefined) {
-  return `<dc:language class="language">${lang ?? "en"}</dc:language>`;
-}
-export function metaId(id: string | undefined) {
-  return `<dc:identifier class="identifier" id="BookId">${id}</dc:identifier>`;
-}
-export function metaDesc(description: string | undefined) {
-  return `<dc:description class="description">${
-    description ?? ""
-  }</dc:description>`;
-}
-export function metaAuthor(author: string | undefined) {
-  return `<dc:creator class="author">${author ?? ""}</dc:creator>`;
-}
-export function metaRights(rights: string | undefined) {
-  return `<dc:rights class="rights">${rights ?? ""}</dc:rights>`;
-}
-export function metaSource(source: string | undefined) {
-  return `<dc:source class="source">${source ?? ""}</dc:source>`;
-}
-export function metaDate() {
-  return `<dc:date>${new Date()}</dc:date>`;
-}
-export function metaCover() {
-  return '<meta name="cover" content="cover"/>'
-}
+

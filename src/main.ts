@@ -1,125 +1,29 @@
-import { parse } from "node-html-parser";
-import * as p from "node-html-parser";
-import { Parameter, EpubChapter, File, EpubSettings } from "../types";
+import { File, EpubSettings, InternalEpubChapter } from "@types";
 import {
   createFile,
-  getValidName,
-  isValid,
-  parseJSon,
   sleep,
-} from "./methods/helper";
-import { createStyle } from "./methods/createStyle";
+  getImageType,
+  removeFileExtension,
+  setChapterFileNames,
+} from "@methods/helper";
+import { createStyle } from "@methods/createStyle";
+import { createMetadata } from "@constructors/metadataConstructor";
+import { createChapter } from "@methods/createChapter";
 import {
-  metaAuthor,
-  metaDate,
-  metaDesc,
-  metaId,
-  metaLang,
-  metaRights,
-  metaSource,
-  metaTitle,
-} from "./constructors/metadataConstructor";
-import { createChapter } from "./methods/createChapter";
-import {
-  maniChapter,
-  maniCover,
-  maniNav,
-  maniStyle,
-  maniToc,
-} from "./constructors/manifestConstructor";
+  manifestChapter,
+  manifestCover,
+  manifestImage,
+  manifestNav,
+  manifestStyle,
+  manifestToc,
+} from "@constructors/manifestConstructor";
 import {
   defaultContainer,
   defaultEpub,
   defaultHtmlToc,
   defaultNcxToc,
-} from "./constructors/defaultsConstructor";
-
-const getImageType = (path: string) => {
-  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/);
-};
-
-export const EpubSettingsLoader = async (
-  file: File[],
-  localOnProgress?: (progress: number) => void
-) => {
-  try {
-    var jsonSettingsFile = file.find((x) => x.path.endsWith(".json"));
-    if (jsonSettingsFile) {
-      return parseJSon(jsonSettingsFile.content) as EpubSettings;
-    }
-    var dProgress = 0.01;
-    localOnProgress?.(dProgress);
-    var epubSettings = { chapters: [] as EpubChapter[] } as EpubSettings;
-    if (!isValid(file, ["toc.ncx", "toc.html", ".opf", "styles.css"])) {
-      throw "This is not a valid Epub file created by this library(epub-constructor)";
-    }
-
-    var pageContent =
-      file.find((x) => x.path.indexOf(".opf") != -1)?.content ?? "";
-    var style =
-      file.find((x) => x.path.indexOf("styles.css") != -1)?.content ?? "";
-    var chapters = [] as string[] | p.HTMLElement[];
-
-    epubSettings.stylesheet = style;
-    var page = undefined as undefined | p.HTMLElement;
-    page = parse(pageContent);
-    epubSettings.parameter = page.querySelectorAll("param").map((a) => {
-      return {
-        name: a.getAttribute("name"),
-        value: a.getAttribute("value"),
-      } as Parameter;
-    });
-    epubSettings.title = page.querySelector(".title").innerText;
-    epubSettings.author = page.querySelector(".author").innerText;
-    epubSettings.rights = page.querySelector(".rights").innerText;
-    epubSettings.description = page.querySelector(".description").innerText;
-    epubSettings.language = page.querySelector(".language").innerText;
-    epubSettings.bookId = page.querySelector(".identifier").innerHTML;
-    epubSettings.source = page.querySelector(".source").innerText;
-    chapters = page.querySelectorAll("itemref");
-
-    if (!epubSettings.chapters) {
-      epubSettings.chapters = [] as EpubChapter[];
-    }
-
-    const len = chapters.length + 1;
-    var index = 0;
-    for (let x of chapters) {
-      try {
-        var content = "";
-        var chItem = "";
-        var chId = x.getAttribute("idref");
-        chItem =
-          page
-            ?.querySelector("item[id='" + chId + "']")
-            ?.getAttribute("href") ?? "";
-        content = file.find((x) => x.path.indexOf(chItem) != -1)?.content ?? "";
-        var chapter = parse(content);
-        epubSettings.chapters.push({
-          parameter: chapter.querySelectorAll("param").map((a: any) => {
-            return {
-              name: a.getAttribute("name"),
-              value: a.getAttribute("value"),
-            } as Parameter;
-          }),
-          title: chapter.querySelector("title")?.innerText ?? "",
-          htmlBody: chapter.querySelector("body").innerHTML,
-        });
-        dProgress = (index / parseFloat(len.toString())) * 100;
-        localOnProgress?.(dProgress);
-        index++;
-        await sleep(0);
-      } catch (error) {
-        throw error;
-      }
-    }
-    dProgress = (len / parseFloat(len.toString())) * 100;
-    localOnProgress?.(dProgress);
-    return epubSettings;
-  } catch (error) {
-    throw error;
-  }
-};
+} from "@constructors/defaultsConstructor";
+import { EpubSettingsLoader } from "@loader/EpubSettingsLoader";
 
 export default class EpubFile {
   epubSettings: EpubSettings;
@@ -128,135 +32,144 @@ export default class EpubFile {
     this.epubSettings = epubSettings;
   }
 
+  /**
+   * Constructs the EPUB file based on the provided settings.
+   * @param localOnProgress Optional callback function to track the progress of EPUB construction.
+   * @returns An array of File objects representing the files in the EPUB.
+   * @throws Error if the EPUB file needs at least one chapter.
+   */
   public async constructEpub(
     localOnProgress?: (progress: number) => Promise<void>
-  ) {
-    var files = [] as File[];
-    files.push(createFile("mimetype", "application/epub+zip"));
-    var metadata = [""];
-    var manifest = [""];
-    var spine = [""];
-    var dProgress = 0;
+  ): Promise<File[]> {
+    const files: File[] = [];
+    const manifest: string[] = [];
+    const spine: string[] = [];
+    let dProgress = 0;
 
-    if (!this.epubSettings.chapters) {
+    if (
+      !this.epubSettings.chapters ||
+      this.epubSettings.chapters.length === 0
+    ) {
       throw new Error("Epub file needs at least one chapter");
+    }
+    if (!this.epubSettings.title || this.epubSettings.title.trim() === "") {
+      throw new Error("Epub file needs a title");
     }
 
     const len = this.epubSettings.chapters.length;
 
-    this.epubSettings.bookId =
-      this.epubSettings.bookId ?? new Date().getUTCMilliseconds().toString();
-    this.epubSettings.fileName =
-      this.epubSettings.fileName ?? this.epubSettings.title;
-    if (
-      this.epubSettings.fileName.endsWith(".epub") ||
-      this.epubSettings.fileName.endsWith(".opf")
-    ) {
-      this.epubSettings.fileName = this.epubSettings.fileName
-        .replace(".opf", "")
-        .replace(".epub", "");
-    }
+    this.epubSettings.bookId ??= new Date().getUTCMilliseconds().toString();
+    this.epubSettings.fileName = removeFileExtension(
+      (this.epubSettings.fileName ?? this.epubSettings.title).replace(
+        /\s/g,
+        "_"
+      )
+    );
+
     if (this.epubSettings.cover) {
       const fileType = getImageType(this.epubSettings.cover);
-      files.push(
-        createFile(
-          "OEBPS/images/cover." + fileType,
-          this.epubSettings.cover,
-          true
-        )
-      );
-      manifest.push(maniCover());
-      spine.push('<itemref idref="cover" linear="no"/>');
+      const coverFilePath = `EPUB/images/cover.${fileType}`;
+      files.push(createFile(coverFilePath, this.epubSettings.cover, true));
+      manifest.push(manifestCover());
     }
+
     files.push(
       createFile(
         "META-INF/container.xml",
         defaultContainer(this.epubSettings.fileName)
+      ),
+      createFile("EPUB/styles.css", createStyle(this.epubSettings.stylesheet)),
+      createFile(
+        "EPUB/script.js",
+        `function fnEpub(){${this.epubSettings.js ?? ""}}`
       )
     );
-    files.push(
-      createFile("OEBPS/styles.css", createStyle(this.epubSettings.stylesheet))
-    );
-    var epub = defaultEpub();
-    var ncxToc = defaultNcxToc(
+
+    let epub = defaultEpub();
+    let ncxToc = defaultNcxToc(
       this.epubSettings.chapters.length,
       this.epubSettings.title,
+      this.epubSettings.bookId,
       this.epubSettings.author
     );
-    var htmlToc = defaultHtmlToc(this.epubSettings.title);
+    let htmlToc = defaultHtmlToc(this.epubSettings.title);
+    let metadata = createMetadata(this.epubSettings);
+    const navMap: string[] = [];
+    const ol: string[] = [];
 
-    metadata.push(metaTitle(this.epubSettings.title));
-    metadata.push(metaLang(this.epubSettings.language));
-    metadata.push(metaId(this.epubSettings.bookId));
-    metadata.push(metaDesc(this.epubSettings.description));
-    metadata.push(metaDate());
-    metadata.push(metaAuthor(this.epubSettings.author));
-    metadata.push(metaRights(this.epubSettings.rights));
-    metadata.push(metaSource(this.epubSettings.source));
+    this.epubSettings.chapters = setChapterFileNames(
+      this.epubSettings.chapters
+    );
 
-    var index = 1;
-    var navMap = [""];
-    var ol = [""];
-    for (var chapter of this.epubSettings.chapters) {
-      dProgress = ((index - 1) / parseFloat(len.toString())) * 100;
+    for (let index = 0; index < len; index++) {
+      const chapter = this.epubSettings.chapters[index] as InternalEpubChapter;
+      dProgress = (index / len) * 100;
 
-      chapter.fileName =
-        chapter.fileName ?? getValidName(chapter, this.epubSettings.chapters);
-      if (!chapter.fileName.endsWith(".html")) chapter.fileName += ".html";
+      const idRef = `${chapter.title.replace(/\s/g, "_")}_image_`;
 
-      manifest.push(
-        maniChapter(chapter.title + index.toString(), chapter.fileName)
-      );
-      spine.push(`<itemref idref="${chapter.title + index}" ></itemref>`);
+      let imageIndex = 0;
+      chapter.htmlBody = chapter.htmlBody
+        .replace(/(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi, (uri: string) => {
+          imageIndex++;
+          const fileType = getImageType(uri);
+          const path = `images/${idRef + imageIndex}.${fileType}`;
+          files.push(createFile(`EPUB/${path}`, uri, true));
+          manifest.push(manifestImage(path));
+          return `../${path}`;
+        })
+        .replace(/\&nbsp/g, "")
+        .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>")
+        .replace(/<\/?(?:html|head|body|input)[^>]*>/g, "");
+
+      manifest.push(manifestChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));
-
+      spine.push(`<itemref idref="${idRef}" ></itemref>`);
       ol.push(`<li><a href="${chapter.fileName}">${chapter.title}</a></li>`);
       navMap.push(
-        `<navPoint id="${
-          chapter.title + index
-        }" playOrder="${index}"> <navLabel> <text>${
-          chapter.title
-        }</text> </navLabel> <content src="${chapter.fileName}" /></navPoint>`
+        `<navPoint id="${idRef}" playOrder="${index + 1}"> 
+          <navLabel> 
+            <text>${chapter.title}</text>
+          </navLabel> <content src="${chapter.fileName}" />
+        </navPoint>`
       );
 
-      index++;
-
-      if (localOnProgress) await localOnProgress?.(dProgress);
-      if (index % 300 === 0 && localOnProgress) await sleep(0);
+      if (localOnProgress && index % 300 === 0) {
+        await sleep(0);
+      }
+      if (localOnProgress) {
+        await localOnProgress(dProgress);
+      }
     }
 
-    manifest.push(maniNav());
-    manifest.push(maniStyle());
-    manifest.push(maniToc());
+    manifest.push(manifestNav(), manifestStyle(), manifestToc());
 
-    epub = epub.replace("#manifest", manifest.join("\n"));
-    epub = epub.replace("#spine", spine.join("\n"));
-    epub = epub.replace("#metadata", metadata.join("\n"));
+    epub = epub
+      .replace("#manifest", manifest.join("\n"))
+      .replace("#spine", spine.join("\n"))
+      .replace("#metadata", metadata);
     ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
 
     files.push(
-      createFile(
-        `OEBPS/${this.epubSettings.fileName}.opf`,
-        `<?xml version="1.0" encoding="utf-8"?>\n` + epub
-      )
+      createFile(`EPUB/${this.epubSettings.fileName}.opf`, epub),
+      createFile("EPUB/toc.xhtml", htmlToc),
+      createFile("EPUB/toc.ncx", ncxToc),
+      createFile("mimetype", "application/epub+zip")
     );
-    files.push(
-      createFile(
-        "OEBPS/toc.html",
-        `<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n` + htmlToc
-      )
-    );
-    files.push(createFile("OEBPS/toc.ncx", ncxToc));
 
-    if (localOnProgress)
-      await localOnProgress?.((len / parseFloat(len.toString())) * 100);
+    if (localOnProgress) {
+      await localOnProgress(len);
+    }
+
     return files;
   }
 
-  // extract EpubSettings from epub file.
-  static async load(file: File[]) {
+  /**
+   * Extracts EPUB settings from an existing EPUB file.
+   * @param file An array of File objects representing the files in the EPUB.
+   * @returns The extracted EPUB settings.
+   */
+  static async load(file: File[]): Promise<EpubSettings> {
     return await EpubSettingsLoader(file);
   }
 }
-

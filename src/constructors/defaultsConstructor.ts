@@ -48,7 +48,7 @@ export function defaultNcxToc(
   chapterLength: number,
   title: string,
   bookId: string,
-  author?: string
+  author?: string,
 ) {
   return `<?xml version="1.0" encoding="UTF-8"?>
   <ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en" dir="ltr">
@@ -63,7 +63,7 @@ export function defaultNcxToc(
 	</docTitle>
 
 	<docAuthor>
-		<text>${author ?? ""}</text>
+		<text>${author ?? ''}</text>
 	</docAuthor>
 
 	<navMap>
@@ -79,8 +79,7 @@ export function defaultNcxToc(
  * @returns The HTML string representing the TOC page.
  */
 export function defaultHtmlToc(title: string) {
-  return `
-  <?xml version="1.0" encoding="utf-8"?>
+  return `<?xml version="1.0" encoding="utf-8"?>
   <!DOCTYPE html>
   <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
       <head>

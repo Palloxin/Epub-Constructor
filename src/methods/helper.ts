@@ -165,7 +165,7 @@ function validateName(fileName: string, chapters: EpubChapter[]) {
  * console.log(sanitizedFileName); // Output: "my_filetxt"
  */
 export function sanitizeFileName(fileName: string) {
-  return fileName.replaceAll(' ', '_').replace(/[^\w]/gi, '').toLowerCase(); // remove all non-word and non-space characters
+  return fileName.replaceAll(' ', '_').replace(/[^\w]/gi, ''); // remove all non-word and non-space characters
 }
 
 /**

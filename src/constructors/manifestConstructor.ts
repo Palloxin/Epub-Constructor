@@ -61,9 +61,11 @@ export function manifestCover(fileFormat: string): string {
  * console.log(imageElement);
  * // Output: <item id="image.jpg" href="https://example.com/image.jpg" media-type="image/jpeg" />
  */
-export function manifestImage(uri: string): string {
+export function manifestImage(uri: string, fileFormat: string): string {
   return `<item id="${uri.replace(
     /.*\//,
     '',
-  )}" href="${uri}" media-type="image/jpeg" />`;
+  )}" href="${uri}" media-type="image/${
+    fileFormat === 'jpg' ? 'jpeg' : fileFormat
+  }" />`;
 }

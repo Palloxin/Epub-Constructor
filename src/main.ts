@@ -112,7 +112,7 @@ export default class EpubFile {
           const fileType = getImageType(uri);
           const path = `OEBPS/images/${idRef}.${fileType}`;
           files.push(createFile(path, uri, true));
-          manifest.push(manifestImage(path));
+          manifest.push(manifestImage('../' + path, fileType));
           return `../../${path}`;
         })
         .replace(/\&nbsp/g, '')

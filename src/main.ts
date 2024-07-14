@@ -30,7 +30,10 @@ export default class EpubFile {
   epubSettings: EpubSettings;
 
   constructor(epubSettings: EpubSettings) {
-    this.epubSettings = epubSettings;
+    this.epubSettings = {
+      ...epubSettings,
+      fileName: sanitizeFileName(epubSettings.fileName ?? epubSettings.title),
+    };
   }
 
   /**
@@ -61,7 +64,7 @@ export default class EpubFile {
 
     this.epubSettings.bookId ??= new Date().getUTCMilliseconds().toString();
     this.epubSettings.fileName = removeFileExtension(
-      sanitizeFileName(this.epubSettings.fileName ?? this.epubSettings.title),
+      this.epubSettings.fileName,
     );
 
     if (this.epubSettings.cover) {

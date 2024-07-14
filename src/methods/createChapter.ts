@@ -8,10 +8,6 @@ import * as sanitizeHtml from 'sanitize-html';
  * @returns The created File object representing the chapter file.
  */
 export function createChapter(chapter: EpubChapter) {
-  // console.log(JSON.stringify(sanitizeHtml, null, 2));
-  //@ts-ignore
-  console.log(sanitizeHtml.default('<p>Hello world</p>'));
-
   return createFile(
     `EPUB/${chapter.fileName}`,
     `

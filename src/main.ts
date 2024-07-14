@@ -1,4 +1,4 @@
-import {File, EpubSettings, InternalEpubChapter} from '@types';
+import { File, EpubSettings, InternalEpubChapter } from '../types';
 import {
   createFile,
   sleep,
@@ -7,9 +7,9 @@ import {
   setChapterFileNames,
   sanitizeFileName,
 } from './methods/helper';
-import {createStyle} from './methods/createStyle';
-import {createMetadata} from './constructors/metadataConstructor';
-import {createChapter} from './methods/createChapter';
+import { createStyle } from './methods/createStyle';
+import { createMetadata } from './constructors/metadataConstructor';
+import { createChapter } from './methods/createChapter';
 import {
   manifestChapter,
   manifestCover,
@@ -24,7 +24,7 @@ import {
   defaultHtmlToc,
   defaultNcxToc,
 } from './constructors/defaultsConstructor';
-import {EpubSettingsLoader} from './loader/EpubSettingsLoader';
+import { EpubSettingsLoader } from './loader/EpubSettingsLoader';
 
 export default class EpubFile {
   epubSettings: EpubSettings;
@@ -66,9 +66,9 @@ export default class EpubFile {
 
     if (this.epubSettings.cover) {
       const fileType = getImageType(this.epubSettings.cover);
-      const coverFilePath = `EPUB/images/cover.${fileType}`;
+      const coverFilePath = `OEBPS/images/cover.${fileType}`;
       files.push(createFile(coverFilePath, this.epubSettings.cover, true));
-      manifest.push(manifestCover());
+      manifest.push(manifestCover(fileType));
     }
 
     files.push(
@@ -103,17 +103,17 @@ export default class EpubFile {
       const chapter = this.epubSettings.chapters[index] as InternalEpubChapter;
       dProgress = (index / len) * 100;
 
-      const idRef = `${chapter.title.replace(/\s/g, '_')}_image_`;
-
       let imageIndex = 0;
+      const idRef = `${sanitizeFileName(chapter.title)}_image_${imageIndex}`;
+
       chapter.htmlBody = chapter.htmlBody
         .replace(/(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi, (uri: string) => {
           imageIndex++;
           const fileType = getImageType(uri);
-          const path = `images/${idRef + imageIndex}.${fileType}`;
-          files.push(createFile(`EPUB/${path}`, uri, true));
+          const path = `OEBPS/images/${idRef}.${fileType}`;
+          files.push(createFile(path, uri, true));
           manifest.push(manifestImage(path));
-          return `../${path}`;
+          return `../../${path}`;
         })
         .replace(/\&nbsp/g, '')
         .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, '$1</img>')

@@ -43,8 +43,11 @@ export function manifestStyle(): string {
  *
  * @returns {string} The XML element for the cover image.
  */
-export function manifestCover(): string {
-  return `<item id="cover" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image" />`;
+export function manifestCover(fileFormat: string): string {
+  fileFormat = fileFormat.replace('.', '');
+  return `<item id="cover" href="../OEBPS/images/cover.${fileFormat}" media-type="image/${
+    fileFormat === 'jpg' ? 'jpeg' : fileFormat
+  }" properties="cover-image" />`;
 }
 /**
  * Generates an XML element string for an image in a manifest file.
@@ -61,7 +64,6 @@ export function manifestCover(): string {
 export function manifestImage(uri: string): string {
   return `<item id="${uri.replace(
     /.*\//,
-    ""
+    '',
   )}" href="${uri}" media-type="image/jpeg" />`;
 }
-

@@ -1,4 +1,4 @@
-import {EpubChapter, File, InternalEpubChapter} from '../../types';
+import { EpubChapter, File, InternalEpubChapter } from '../../types';
 
 /**
  * Creates a file object with the specified path, content, and optional isImage flag.
@@ -117,7 +117,7 @@ export function bodyExtrator(content: string) {
  * console.log(imageType); // Output: "jpg"
  */
 export function getImageType(path: string) {
-  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/) ?? 'jpg';
+  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/)[0] ?? 'jpg';
 }
 
 /**
@@ -165,7 +165,7 @@ function validateName(fileName: string, chapters: EpubChapter[]) {
  * console.log(sanitizedFileName); // Output: "my_filetxt"
  */
 export function sanitizeFileName(fileName: string) {
-  return fileName.replace(/[^\w\s]/gi, '').toLowerCase(); // remove all non-word and non-space characters
+  return fileName.replaceAll(' ', '_').replace(/[^\w]/gi, '').toLowerCase(); // remove all non-word and non-space characters
 }
 
 /**
@@ -204,7 +204,6 @@ export function setChapterFileNames(
     }
     usedNames.add(fileName);
     chapter.fileName = fileName;
-    console.log(fileName);
 
     return chapter;
   });

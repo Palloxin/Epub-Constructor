@@ -1,6 +1,6 @@
 {
   "name": "@cd-z/epub-constructor",
-  "version": "2.2.5",
+  "version": "3.0.0",
   "description": "This is a react library that creates an epub structure. This library only provides the file structure. To get a valid epub file it is needed to to create files from the provided data and compress them to a epub file.",
   "main": "index.ts",
   "repository": {
@@ -18,7 +18,6 @@
     "epub-constructor"
   ],
   "dependencies": {
-    "node-html-parser": "^4.1.4",
     "sanitize-html": "^2.13.0"
   },
   "author": "Alen Toma & Patrick Loser",

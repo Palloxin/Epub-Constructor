@@ -5,7 +5,7 @@
   "main": "index.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CD-Z/Epub-Constructor.git"
+    "url": "git+https://github.com/CD-Z/Epub-Constructor.git"
   },
   "bugs": {
     "url": "https://github.com/CD-Z/Epub-Constructor/issues"

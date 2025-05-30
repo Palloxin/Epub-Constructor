@@ -1,5 +1,5 @@
-import { EpubChapter } from '../../types';
-import { createFile } from './helper';
+import {EpubChapter} from '../../types';
+import {createFile} from './helper';
 import * as sanitizeHtml from 'sanitize-html';
 /**
  * Creates an EPUB chapter file with the provided chapter information.

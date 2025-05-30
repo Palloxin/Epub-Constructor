@@ -37,4 +37,3 @@ export interface EpubSettings {
   cover?: string;
   js?: string;
 }
-

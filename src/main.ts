@@ -29,9 +29,13 @@ export default class EpubFile {
   epubSettings: EpubSettings;
 
   constructor(epubSettings: EpubSettings) {
+    const fileName = epubSettings.fileName?.trim();
+
     this.epubSettings = {
       ...epubSettings,
-      fileName: sanitizeFileName(epubSettings.fileName ?? epubSettings.title),
+      fileName: sanitizeFileName(
+        fileName && fileName !== '' ? fileName : epubSettings.title,
+      ),
     };
   }
 
@@ -55,7 +59,11 @@ export default class EpubFile {
     ) {
       throw new Error('Epub file needs at least one chapter');
     }
-    if (!this.epubSettings.title || this.epubSettings.title.trim() === '') {
+    if (
+      !this.epubSettings.title ||
+      this.epubSettings.title.trim() === '' ||
+      !this.epubSettings.fileName
+    ) {
       throw new Error('Epub file needs a title');
     }
 
@@ -109,7 +117,7 @@ export default class EpubFile {
       const idRef = `${sanitizeFileName(chapter.title)}_image_${imageIndex}`;
 
       chapter.htmlBody = chapter.htmlBody
-        .replace(/(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi, (uri: string) => {
+        .replace(/(?<=<img[^>]+src=(?:"|')).+?(?="|')/gi, (uri: string) => {
           imageIndex++;
           const fileType = getImageType(uri);
           const path = `OEBPS/images/${idRef}.${fileType}`;
@@ -117,7 +125,7 @@ export default class EpubFile {
           manifest.push(manifestImage('../' + path, fileType));
           return `../../${path}`;
         })
-        .replace(/\&nbsp/g, '')
+        .replace(/&nbsp/g, '')
         .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, '$1</img>')
         .replace(/<\/?(?:html|head|body|input)[^>]*>/g, '');
 

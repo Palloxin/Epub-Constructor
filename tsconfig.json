@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["ES6"],
-    "types": ["bun-types"]
-    // "baseUrl": "./src/",
-    // "paths": {
-    //   "test": ["../tests/*.test.ts"],
-    //   "@constructors/*": ["constructors/*"],
-    //   "@loader/*": ["loader/*"],
-    //   "@methods/*": ["methods/*"],
-    //   "@types": ["../types.ts"]
-    // }
-  }
+    "types": ["bun-types"],
+    "declaration": true,
+    "outDir": "dist",
+    "module": "ESNext",
+    "target": "ES2020",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "*.ts"],
+  "exclude": ["node_modules", "dist", "tests"]
 }

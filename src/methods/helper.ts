@@ -1,4 +1,4 @@
-import { EpubChapter, File, InternalEpubChapter } from '../../types';
+import {EpubChapter, File, InternalEpubChapter} from '../../types';
 
 /**
  * Creates a file object with the specified path, content, and optional isImage flag.
@@ -29,8 +29,10 @@ export function createFile(
  */
 export function isValid(file: File[], content: string[]): boolean {
   for (var i = 0; i < content.length; i++) {
-    var item = file.find(x => x.path.indexOf(content[i]) != -1);
-    if (!item) return false;
+    var item = file.find(x => x.path.indexOf(content[i]) !== -1);
+    if (!item) {
+      return false;
+    }
   }
   return true;
 }
@@ -42,7 +44,7 @@ export function isValid(file: File[], content: string[]): boolean {
  * @returns A Promise that resolves after the specified time with the provided arguments.
  */
 export function sleep(time: number, args?: any) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       resolve(args);
     }, time);
@@ -56,7 +58,9 @@ export function sleep(time: number, args?: any) {
  * @returns The first element of the array, or undefined if the array is empty or does not exist.
  */
 export function single(array: any) {
-  if (array && array.length != undefined && array.length > 0) return array[0];
+  if (array && array.length !== undefined && array.length > 0) {
+    return array[0];
+  }
 
   return undefined;
 }
@@ -70,7 +74,9 @@ export function single(array: any) {
  * @throws If the input JSON string is null, empty, or has a length less than or equal to 4.
  */
 export function parseJSon(json: string) {
-  if (json === null || !json || json.length <= 4) return undefined;
+  if (json === null || !json || json.length <= 4) {
+    return undefined;
+  }
   try {
     return JSON.parse(json);
   } catch (e) {
@@ -117,7 +123,7 @@ export function bodyExtrator(content: string) {
  * console.log(imageType); // Output: "jpg"
  */
 export function getImageType(path: string) {
-  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/)[0] ?? 'jpg';
+  return path.trim().match(/(?<=\.)[a-z]{1,4}(?=\?|$)/)?.[0] ?? 'jpg';
 }
 
 /**
@@ -133,24 +139,6 @@ export function getImageType(path: string) {
  */
 export function removeFileExtension(name: string) {
   return name.replace(/(.*)(\.opf|\.epub)/, '$1');
-}
-
-/**
- * Validates the uniqueness of a file name within an array of chapters.
- * If the file name already exists, a number is appended to it to make it unique.
- *
- * @param fileName - The file name to be validated.
- * @param chapters - An array of chapters to check for existing file names.
- * @returns A unique file name.
- */
-function validateName(fileName: string, chapters: EpubChapter[]) {
-  var i = 0;
-  while (chapters.find(a => a.fileName == fileName)) {
-    i++;
-    fileName += i;
-  }
-
-  return fileName;
 }
 
 /**
@@ -194,7 +182,7 @@ export function setChapterFileNames(
     newChapter.fileName = sanitizeFileName(newChapter.fileName);
     return newChapter;
   });
-  return sanitizedChapters.map((chapter: InternalEpubChapter, i: number) => {
+  return sanitizedChapters.map((chapter: InternalEpubChapter) => {
     let fileName =
       'content/' + chapter.fileName.replaceAll(' ', '_') + '.xhtml';
     let j = 1;

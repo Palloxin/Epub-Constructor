@@ -91,10 +91,9 @@ export function parseJSon(json: string) {
  * @returns The extracted JSON string, or an empty string if no JSON is found.
  */
 export function jsonExtractor(content: string) {
-  const jsonReg = new RegExp(/<JSON>(.|\n)*?<\/JSON>/, 'mgi');
+  const jsonReg = new RegExp(/<JSON>[^]*?<\/JSON>/, 'mgi');
   return (single(jsonReg.exec(content)) ?? '')
-    .replace(/<JSON>/gim, '')
-    .replace(/<\/JSON>/gim, '');
+    .replace(/<\/?JSON>/gim, '');
 }
 
 /**
@@ -104,10 +103,9 @@ export function jsonExtractor(content: string) {
  * @returns The extracted body content without the <body> tags.
  */
 export function bodyExtrator(content: string) {
-  const jsonReg = new RegExp(/<body>(.|\n)*?<\/body>/, 'mgi');
+  const jsonReg = new RegExp(/<body>[^]*?<\/body>/, 'mgi');
   return (single(jsonReg.exec(content)) ?? '')
-    .replace(/<body>/gim, '')
-    .replace(/<\/body>/gim, '');
+    .replace(/<\/?body>/gim, '');
 }
 
 /**
@@ -138,7 +136,8 @@ export function getImageType(path: string) {
  * console.log(result); // Output: "example"
  */
 export function removeFileExtension(name: string) {
-  return name.replace(/(.*)(\.opf|\.epub)/, '$1');
+  return name
+    .replace(/([^]+)(?:\.opf|\.epub)/, '$1');
 }
 
 /**
@@ -153,7 +152,7 @@ export function removeFileExtension(name: string) {
  * console.log(sanitizedFileName); // Output: "my_filetxt"
  */
 export function sanitizeFileName(fileName: string) {
-  return fileName.replaceAll(' ', '_').replace(/[^\w]/gi, ''); // remove all non-word and non-space characters
+  return fileName.replaceAll(' ', '_').replace(/[^\w]+/gi, ''); // remove all non-word and non-space characters
 }
 
 /**

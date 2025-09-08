@@ -113,7 +113,7 @@ export function createChapter(chapter: EpubChapter) {
                   allowedAttributes: false, //@ts-ignore
                   // disallowedTagsMode: 'completelyDiscard',
                 })
-                .replace(/<!--(.|\n)*?-->/gm, '') //? remove comments
+                .replace(/<!--[^]*?-->/g, '') //? remove comments
             }
         </body>
     </html>

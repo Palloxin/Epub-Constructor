@@ -63,7 +63,7 @@ export function manifestCover(fileFormat: string): string {
  */
 export function manifestImage(uri: string, fileFormat: string): string {
   return `<item id="${uri.replace(
-    /.*\//,
+    /[^]*\//,
     '',
   )}" href="${uri}" media-type="image/${
     fileFormat === 'jpg' ? 'jpeg' : fileFormat

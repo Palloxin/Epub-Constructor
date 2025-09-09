@@ -117,7 +117,7 @@ export default class EpubFile {
       const idRef = `${sanitizeFileName(chapter.title)}_image_${imageIndex}`;
 
       chapter.htmlBody = chapter.htmlBody
-        .replace(/(?<=<img[^>]+?\bsrc=[\"\'])[^>]+?(?=[\"\'][> ])/gi, (uri: string) => {
+        .replace(/(?<=<img[^>]+?\bsrc=[\"\'])[^>]+?(?=[\"\'][>\s\/])/gi, (uri: string) => {
           imageIndex++;
           const fileType = getImageType(uri);
           const path = `OEBPS/images/${idRef}.${fileType}`;

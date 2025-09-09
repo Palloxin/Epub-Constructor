@@ -126,7 +126,7 @@ export default class EpubFile {
           return `../../${path}`;
         })
         .replace(/&nbsp/g, '')
-        .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, '$1</img>')
+        .replace(/<img[^>]+>(?!\s*<\/img>)/g, '$&</img>')
         .replace(/<\/?(?:html|head|body|input)\b[^>]*>/g, '');
 
       manifest.push(manifestChapter(idRef, chapter.fileName));
